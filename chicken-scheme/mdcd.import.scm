@@ -191,12 +191,12 @@
                     (mdcd-path-for-syntax name)))
           (printer 
             (lambda (x) 
-                          (display x); printing out the path
-                          (newline)  ; that we're about to load
-                                     ; (debugging mostly)
-                          (if (file-exists? x)
-                              (display (read-all x))
-                          )
+                      (display x); printing out the path
+                      (newline)  ; that we're about to load
+                                 ; (debugging mostly)
+                      (if (file-exists? x)
+                          (display (read-all x))
+                      )
             )
           )
          )
