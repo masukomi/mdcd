@@ -80,7 +80,7 @@
     ; "[^\\w_\-]+" seemed like it was too likely to result
     ; in overlap. I could hash the name but I would prefer
     ; to keep the files as something meaningful to humans.
-    (string-substitute* name '(("[?:/*| ]+" . "_"))))
+    (string-substitute* name '(("[!%&*+./:<=>?@~ ^$]+" . "_"))))
 
   ; ## Public: mdcd-file-for
   ; Provides the file-path for a given identifier. 

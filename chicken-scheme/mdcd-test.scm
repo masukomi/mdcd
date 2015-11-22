@@ -34,12 +34,6 @@ Hah!")
       (test-group "directories"
         ; they functions, variables, and syntax things should 
         ; all be stored in different places
-        (test-assert "funtions not stored in same dir as variables"
-                     (not (equal? docfun-fun-path docfun-var-path)))
-        (test-assert "functions not stored in same dir as syntax"
-                     (not (equal? docfun-fun-path docfun-syntax-path)))
-        (test-assert "variables not stored in same dir as syntax"
-                     (not (equal? docfun-var-path docfun-syntax-path)))
         (let ((manual-fun-path (string-concatenate (list
                          (get-mdcd-home) ; ends with a /
                          "functions/test-mdcd-docfun.md")))
@@ -49,12 +43,12 @@ Hah!")
               (manual-syntax-path (string-concatenate (list
                          (get-mdcd-home) ; ends with a /
                          "syntax/test-mdcd-docfun.md"))))
-        (test "functions stored in correct dir"
-              manual-fun-path docfun-fun-path)
-        (test "variable stored in correct dir" 
-              manual-var-path docfun-var-path)
-        (test "syntax stored in correct dir"
-              manual-syntax-path docfun-syntax-path)
+          (test "functions stored in correct dir"
+                manual-fun-path docfun-fun-path)
+          (test "variable stored in correct dir" 
+                manual-var-path docfun-var-path)
+          (test "syntax stored in correct dir"
+                manual-syntax-path docfun-syntax-path)
 
         )
       )
@@ -62,9 +56,10 @@ Hah!")
         ; doesn't do space removal because you can't name
         ; anything with a space in scheme
         (test "function names converted to safe file names" 
-              "horribly_named_fun_with_crap_" 
+              "a-b_c_d_e_f_g_h_i_j_k_l_m_n_o_p_q_r_s" 
+              ;^^^ note the hyhpen stays a hyphen
               (filepath:take-base-name
-                (mdcd-path-for-fun "horribly/named:fun|with*crap?" )))
+                (mdcd-path-for-fun "a-b$c%d&e*f+g!h.i/j:k<l=m>n?o@p^q~r s" )))
       )
     )
     ; (test-group "file names"
