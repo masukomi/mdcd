@@ -22,19 +22,22 @@
     mdcd-path-for-var
     mdcd-path-for-fun
     mdcd-path-for-syntax
-    ;TODO 
-    ; * show-params
-    ; * show-returns
-    ; * show-example
-    ; * extract-section
+    show-description
+    show-params
+    show-returns
+    show-examples
+    show-notes
+    show-section
 
    )
   (import chicken)
   (import scheme)
   (use files)
   (use directory-utils)
+  (use data-structures)
   (use utils); for read-all procedure
   (require-extension regex)
+  (import (prefix mdcd-sections ms:))
 
   ; ## Private: *mcdc-home*
   ; We just need to set this because Chicken Scheme
@@ -88,6 +91,8 @@
   ; * identifier - the function/variable/syntax you want documentation for.
   ; ### Returns:
   ; The file-path where the identifiers docs should be written / found.
+  
+  ; TODO: make subfolder be an array defaulting to an empty one
   (define (mdcd-file-for identifier #!optional (subfolder ""))
     (make-absolute-pathname 
       (list (get-mdcd-home) 
@@ -185,23 +190,47 @@
   * name - the name of the method/variable/syntax you want 
     documentation for.")
   (define (show-doc name)
-    (let ((paths (list
-                    (mdcd-path-for-fun name)
-                    (mdcd-path-for-var name)
-                    (mdcd-path-for-syntax name)))
-          (printer 
-            (lambda (x) 
-                      (display x); printing out the path
-                      (newline)  ; that we're about to load
-                                 ; (debugging mostly)
-                      (if (file-exists? x)
-                          (display (read-all x))
-                      )
-            )
-          )
-         )
-      (for-each printer paths)
-      (display "Undocumented")
+    (let ((response-string (read-doc name)))
+      (if response-string
+        (display response-string)
+        (display "Undocumented"))
     )
   )
-)
+  (define (show-description name)
+    (show-section name 'description))
+  (define (show-params name)
+    (show-section name 'parameters))
+  (define (show-returns name)
+    (show-section name 'returns))
+  (define (show-examples name)
+    (show-section name 'examples))
+  (define (show-notes name)
+    (show-section name 'notes))
+
+  (define (show-section name section)
+    (let ((doc-string (read-doc name)))
+      (if doc-string
+        (for-each (lambda(x)(print x))
+                  (ms:extract-section section doc-string))
+        "Undocumented"
+        )
+      )
+    )
+
+  
+  (define (read-doc name)
+    (call/cc (lambda(k)
+                (let ((paths (list
+                                (mdcd-path-for-fun name)
+                                (mdcd-path-for-var name)
+                                (mdcd-path-for-syntax name)))
+                      (reader 
+                        (lambda (x) 
+                                  (if (file-exists? x)
+                                      (k (read-all x))
+                                      #f))))
+                  (for-each reader paths)))))
+
+
+
+); END module mdcd

@@ -7,12 +7,25 @@
 (use directory-utils)
 (use srfi-13)
 (use filepath)
+(use ports)
 
 (define (remove-file file-path)
   (if (file-exists? file-path)
     (system (sprintf "rm ~A" file-path))
   )
 )
+
+(define (get-doc-section section-method docfun-fun-path test-doc-string)
+  (remove-file docfun-fun-path)
+  (doc-fun "test-mdcd-docfun" test-doc-string)
+  (let ((response-string 
+          (with-output-to-string
+                  (lambda()(section-method "test-mdcd-docfun"))))
+                  )
+    (remove-file docfun-fun-path)
+    response-string)
+
+  )
 
 
 (let (
@@ -23,7 +36,7 @@ Totally not a real method
 ## Returns: 
 `#f` because it's bogus
 
-## Example:
+## Examples:
 Hah!")
       (docfun-fun-path (mdcd-path-for-fun "test-mdcd-docfun" ))
       (docfun-var-path (mdcd-path-for-var "test-mdcd-docfun" ))
@@ -92,6 +105,40 @@ Hah!")
      
       )
     )
+    (test-group "display"
+      (test-group "show-doc"
+        (let ((test-doc-plus-newline (conc test-doc-string #\newline)))
+          (test "can display entire doc"
+                test-doc-plus-newline
+                (get-doc-section show-doc docfun-fun-path test-doc-string)))
+        )
+
+      (test-group "show-description"
+          (test "can display description alone"
+"## Private: test-mdcd-docfun
+Totally not a real method
+
+"
+                (get-doc-section show-description docfun-fun-path test-doc-string))
+      )
+      (test-group "show-returns"
+          (test "can display returns alone"
+"## Returns: 
+`#f` because it's bogus
+
+"
+                (get-doc-section show-returns docfun-fun-path test-doc-string))
+      )
+      (test-group "show-examples"
+          (test "can display examples alone"
+"## Examples:
+Hah!
+
+"
+                (get-doc-section show-examples docfun-fun-path test-doc-string))
+      )
+    )
+    
   )
 )
 
