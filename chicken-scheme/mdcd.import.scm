@@ -13,21 +13,30 @@
 
 (module mdcd
   (
+    ; configuration
     set-mdcd-home
     get-mdcd-home
+
+    ; documentating things
     doc-fun
     doc-syntax
     doc-var
+    ; displaying docs
     show-doc
-    mdcd-path-for-var
-    mdcd-path-for-fun
-    mdcd-path-for-syntax
+    read-doc
     show-description
     show-params
     show-returns
     show-examples
     show-notes
     show-section
+
+    
+    ; the following are only exported for 
+    ; testing purposes. please delete before creating eggs.
+    mdcd-path-for-var
+    mdcd-path-for-fun
+    mdcd-path-for-syntax
 
    )
   (import chicken)
