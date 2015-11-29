@@ -128,11 +128,13 @@
   (define (mdcd-path-for-syntax name)
     (mdcd-file-for name "syntax"))
 
+  (define (write-doc path-function name doc-string)
+    (let ((file-path (path-function name)))
+      (mdcd-write-doc doc-string file-path)
+      file-path))
   ; see below for documentation
   (define (doc-fun name doc-string)
-   (let ((file-path (mdcd-path-for-fun name)))
-          (mdcd-write-doc doc-string file-path)
-          file-path))
+    (write-doc mdcd-path-for-fun name doc-string))
   ; We now have enough code to start eating our own dog food.
   ; YAY.
   (doc-fun "doc-fun" "## Public: doc-fun
@@ -164,9 +166,7 @@
   `mini-syntax-identifier`. Just make an attempt to come as close to something
   referencable (like a method name) as possible.")
   (define (doc-syntax mini-syntax-identifier doc-string)
-    (let ((file-path (mdcd-path-for-syntax mini-syntax-identifier)))
-          (mdcd-write-doc doc-string file-path)
-          file-path))
+    (write-doc mdcd-path-for-syntax mini-syntax-identifier doc-string))
 
   (doc-fun "doc-var" "## Public: doc-var
   Generates documentation for a variable.
@@ -180,9 +180,7 @@
   ### Returns:
   The path to the file where the docs were written.")
   (define (doc-var name doc-string)
-    (let ((file-path (mdcd-path-for-var name)))
-          (mdcd-write-doc doc-string file-path)
-          file-path))
+    (write-doc mdcd-path-for-var name doc-string))
 
   (doc-fun "show-doc" "## Public: show-doc
   Displays the documentation for the specified key
