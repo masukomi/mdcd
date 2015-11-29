@@ -68,8 +68,8 @@
   ; The path to the directory it will save files to.
   ;
   (define (set-mdcd-home directory-list)
-    (define *mdcd-home* directory-list)
-          (get-mdcd-home))
+    (set! *mdcd-home* directory-list)
+    (get-mdcd-home))
 
   ; ## Public: get-mdcd-home
   ; Returns the path to the directory where MDCD files will be stored.
