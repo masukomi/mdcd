@@ -4,6 +4,7 @@
     get-mdcd-home
     mdcd-enabled?
     mdcd-disable
+    mdcd-use-default-home
 
     get-mdcd-home-dirs      ; mostly to facilitate testing 
     mdcd-default-home-dirs  ; but maybe someone else will find 
@@ -12,7 +13,8 @@
   (import chicken)
   (import scheme)
   (use files)
-
+  (use data-structures)
+  (use posix)
 
 
 
@@ -58,7 +60,9 @@
     #t)
   
   (define (mdcd-default-home-dirs)
-    (list (get-environment-variable "HOME" )
-          "mdcd" "scheme"))
+    (append (string-split (current-directory) "/") '("docs")))
+
+  (define (mdcd-use-default-home)
+    (set-mdcd-home (mdcd-default-home-dirs)))
 
 )

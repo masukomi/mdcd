@@ -29,7 +29,7 @@
   )
 
 
-(set-mdcd-home (mdcd-default-home-dirs))
+(mdcd-use-default-home)
 
 (let (
       (test-doc-string 
@@ -98,7 +98,7 @@ Hah!")
                        (not (file-exists? docfun-syntax-path)))
       )
       (test-group "enabled"
-        (set-mdcd-home (mdcd-default-home-dirs))
+        (mdcd-use-default-home)
         (test-group "sanity check"
           (test-assert (mdcd-enabled?))
           (test "function file path"
@@ -134,7 +134,7 @@ Hah!")
       )
     )
     (test-group "retrieval"
-      (set-mdcd-home (mdcd-default-home-dirs))
+      (mdcd-use-default-home)
       (test-group "show-doc"
         (let ((test-doc-plus-newline (conc test-doc-string #\newline)))
           (test "can display entire doc"
@@ -171,7 +171,6 @@ Hah!
         (test "disabled when home is null"
               "MDCD: Disabled"
               (read-doc "test-mdcd-docfun" ))
-        (set-mdcd-home old-mdcd-home)
         
       )
 
