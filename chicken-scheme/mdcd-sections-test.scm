@@ -1,4 +1,4 @@
-#!/usr/local/bin/csi
+;#!/usr/local/bin/csi
 
 ; (require-extension test)
 (use test); ^^ same effect
@@ -117,5 +117,5 @@ Hah!"))
 
   ); end inner let
 )
-(test-exit)
+; (test-exit)
 
