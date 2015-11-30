@@ -5,20 +5,22 @@
     mdcd-enabled?
     mdcd-disable
 
-    get-mdcd-home-dirs ; mostly to facilitate testing 
-    default-home-dirs  ; but maybe someone else will find 
-                       ; a use for them
+    get-mdcd-home-dirs      ; mostly to facilitate testing 
+    mdcd-default-home-dirs  ; but maybe someone else will find 
+                            ; a use for them
    )
   (import chicken)
   (import scheme)
   (use files)
 
-  
-  (define (default-home-dirs)
-    (list (get-environment-variable "HOME" )
-          "mdcd" "scheme"))
-  ; Make sure it's set out of the gate
-  (define *mdcd-home* (default-home-dirs))
+
+
+
+  ; we want it to NOT write files by default
+  ; because you don't want users of your code
+  ; suddenly having your docs spewed into
+  ; their systems
+  (define *mdcd-home* '())
 
   ; ## Public: set-mcdc-home
   ; Sets the directory where MCDC files are stored
@@ -54,5 +56,9 @@
   (define (mdcd-disable)
     (set-mdcd-home '())
     #t)
+  
+  (define (mdcd-default-home-dirs)
+    (list (get-environment-variable "HOME" )
+          "mdcd" "scheme"))
 
 )

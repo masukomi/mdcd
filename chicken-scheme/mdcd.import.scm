@@ -88,14 +88,23 @@
   ; ### Returns:
   ; Returns #t if successful
   (define (mdcd-write-doc doc-string file-path)
-   (if (not (directory-exists? (pathname? file-path)))
-    (create-pathname-directory file-path))
-   (with-output-to-file file-path
-    (lambda ()
-     (display doc-string)
-     (newline)))
-    #t)
+    (if (mdcd-enabled?)
+      (begin
+       (if (not (directory-exists? (pathname? file-path)))
+        (create-pathname-directory file-path))
+       (with-output-to-file file-path
+        (lambda ()
+         (display doc-string)
+         (newline)))
 
+        #t)
+      #f)
+    )
+
+  (define (write-doc path-function name doc-string)
+    (let ((file-path (path-function name)))
+      (mdcd-write-doc doc-string file-path)
+      file-path))
 
   (define (mdcd-path-for-var name)
     (mdcd-file-for name "variables"))
@@ -106,10 +115,7 @@
   (define (mdcd-path-for-syntax name)
     (mdcd-file-for name "syntax"))
 
-  (define (write-doc path-function name doc-string)
-    (let ((file-path (path-function name)))
-      (mdcd-write-doc doc-string file-path)
-      file-path))
+  
   ; see below for documentation
   (define (doc-fun name doc-string)
     (if (mdcd-enabled?)

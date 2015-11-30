@@ -2,9 +2,11 @@
 
 ; (require-extension test)
 (use test); ^^ same effect
+;(use files)
 (import mdcd-config)
 (import mdcd)
-(use files)
+
+
 (test-group "mdcd-config"
   (test "set-mdcd-home"
         "/foo/bar/baz/"

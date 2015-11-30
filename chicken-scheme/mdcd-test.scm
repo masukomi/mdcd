@@ -29,6 +29,8 @@
   )
 
 
+(set-mdcd-home (mdcd-default-home-dirs))
+
 (let (
       (test-doc-string 
 "## Private: test-mdcd-docfun
@@ -44,7 +46,6 @@ Hah!")
       (docfun-syntax-path (mdcd-path-for-syntax "test-mdcd-docfun" ))
 )
   (test-group "MDCD"
-    
     (test-group "file paths"
       (test-group "directories"
         ; they functions, variables, and syntax things should 
@@ -80,34 +81,60 @@ Hah!")
     ; (test-group "file names"
     ; )
     (test-group "creation"
-      (test-group "functions"
-        ; doc-fun should create a file
-        ; so, first delete it.
-        (remove-file docfun-fun-path)
-        (doc-fun "test-mdcd-docfun" test-doc-string)
-        (test-assert "documenting a function creates a file"
-                     (file-exists? docfun-fun-path))
-        
-        (remove-file docfun-fun-path) ; cleanup
+      (test-group "disabled"
+        ; nothing should be created when disabled
+          (mdcd-disable)
+          (remove-file docfun-fun-path)
+          (doc-fun "test-mdcd-docfun" test-doc-string)
+          (test-assert "documenting a function DOESN'T create a file"
+                       (not (file-exists? docfun-fun-path)))
+          (remove-file docfun-var-path)
+          (doc-var "test-mdcd-docfun" test-doc-string)
+          (test-assert "documenting a variable DOESN'T create a file"
+                       (not (file-exists? docfun-var-path)))
+          (remove-file docfun-syntax-path)
+          (doc-syntax "test-mdcd-docfun" test-doc-string)
+          (test-assert "documenting a variable DOESN'T create a file"
+                       (not (file-exists? docfun-syntax-path)))
       )
-      (test-group "variables"
-        (remove-file docfun-var-path)
-        (doc-var "test-mdcd-docfun" test-doc-string)
-        (test-assert "documenting a variable creates a file"
-                     (file-exists? docfun-var-path))
-        (remove-file docfun-var-path) ; cleanup
+      (test-group "enabled"
+        (set-mdcd-home (mdcd-default-home-dirs))
+        (test-group "sanity check"
+          (test-assert (mdcd-enabled?))
+          (test "function file path"
+                docfun-fun-path 
+                (mdcd-path-for-fun "test-mdcd-docfun" )
+                    ))
+        (test-group "functions"
+          ; doc-fun should create a file
+          ; so, first delete it.
+          (remove-file docfun-fun-path)
+          (doc-fun "test-mdcd-docfun" test-doc-string)
+          (test-assert "documenting a function creates a file"
+                       (file-exists? docfun-fun-path))
+          
+          (remove-file docfun-fun-path) ; cleanup
+        )
+        (test-group "variables"
+          (remove-file docfun-var-path)
+          (doc-var "test-mdcd-docfun" test-doc-string)
+          (test-assert "documenting a variable creates a file"
+                       (file-exists? docfun-var-path))
+          (remove-file docfun-var-path) ; cleanup
 
-      )
-      (test-group "syntax"
-        (remove-file docfun-syntax-path)
-        (doc-syntax "test-mdcd-docfun" test-doc-string)
-        (test-assert "documenting syntax creates a file"
-                     (file-exists? docfun-syntax-path))
-        (remove-file docfun-syntax-path) ; cleanup
-     
+        )
+        (test-group "syntax"
+          (remove-file docfun-syntax-path)
+          (doc-syntax "test-mdcd-docfun" test-doc-string)
+          (test-assert "documenting syntax creates a file"
+                       (file-exists? docfun-syntax-path))
+          (remove-file docfun-syntax-path) ; cleanup
+        )
+        (mdcd-disable)
       )
     )
     (test-group "retrieval"
+      (set-mdcd-home (mdcd-default-home-dirs))
       (test-group "show-doc"
         (let ((test-doc-plus-newline (conc test-doc-string #\newline)))
           (test "can display entire doc"
@@ -140,14 +167,15 @@ Hah!
                 (get-doc-section show-examples docfun-fun-path test-doc-string))
       )
       (test-group "read-doc"
-        (let ((old-mdcd-home (get-mdcd-home-dirs)))
-          (mdcd-disable)
-          (test "disabled when home is null"
-                "MDCD: Disabled"
-                (read-doc "test-mdcd-docfun" ))
-          (set-mdcd-home old-mdcd-home)
-        )
+        (mdcd-disable)
+        (test "disabled when home is null"
+              "MDCD: Disabled"
+              (read-doc "test-mdcd-docfun" ))
+        (set-mdcd-home old-mdcd-home)
+        
       )
+
+      (mdcd-disable)
     )
     
   )
