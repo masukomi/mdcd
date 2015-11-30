@@ -2,6 +2,7 @@
 
 ; (require-extension test)
 (use test); ^^ same effect
+(import mdcd-config)
 (import mdcd)
 (use files)
 (use directory-utils)
@@ -43,6 +44,7 @@ Hah!")
       (docfun-syntax-path (mdcd-path-for-syntax "test-mdcd-docfun" ))
 )
   (test-group "MDCD"
+    
     (test-group "file paths"
       (test-group "directories"
         ; they functions, variables, and syntax things should 
@@ -105,7 +107,7 @@ Hah!")
      
       )
     )
-    (test-group "display"
+    (test-group "retrieval"
       (test-group "show-doc"
         (let ((test-doc-plus-newline (conc test-doc-string #\newline)))
           (test "can display entire doc"
@@ -136,6 +138,15 @@ Hah!
 
 "
                 (get-doc-section show-examples docfun-fun-path test-doc-string))
+      )
+      (test-group "read-doc"
+        (let ((old-mdcd-home (get-mdcd-home-dirs)))
+          (mdcd-disable)
+          (test "disabled when home is null"
+                "MDCD: Disabled"
+                (read-doc "test-mdcd-docfun" ))
+          (set-mdcd-home old-mdcd-home)
+        )
       )
     )
     

@@ -14,8 +14,6 @@
 (module mdcd
   (
     ; configuration
-    set-mdcd-home
-    get-mdcd-home
 
     ; documentating things
     doc-fun
@@ -46,41 +44,12 @@
   (use data-structures)
   (use utils); for read-all procedure
   (require-extension regex)
+  (import mdcd-config)
   (import (prefix mdcd-sections ms:))
 
-  ; ## Private: *mcdc-home*
-  ; We just need to set this because Chicken Scheme
-  ; has no mechanism for testing if a variable has 
-  ; been defined or not. It can be overridden via the
-  ; `set-mcdc-home` method.
-  (define *mdcd-home* 
-    (string-append (get-environment-variable "HOME" )
-      "/mdcd/scheme/"))
+  ;(use symbol-utils); for unbound?
 
-  ; ## Public: set-mcdc-home
-  ; Sets the directory where MCDC files are stored
-  ; 
-  ; ### Parameters:
-  ; * directory-list a list of directories.
-  ;   E.g.: '("home" "current_username")
-  ; 
-  ; ### Returns: 
-  ; The path to the directory it will save files to.
-  ;
-  (define (set-mdcd-home directory-list)
-    (set! *mdcd-home* directory-list)
-    (get-mdcd-home))
-
-  ; ## Public: get-mdcd-home
-  ; Returns the path to the directory where MDCD files will be stored.
-  ; 
-  ; ### Returns:
-  ; The path to the directory where MDCD files will be stored.
-  ; 
-  ; ### Note:
-  ; Defaults to $HOME/mdcd/scheme/
-  (define (get-mdcd-home)
-    (make-absolute-pathname *mdcd-home* ""))
+  
 
   ; ## Private: mdcd-name-cleaner
   ; converts method and variable names into something more filesystem friendly
@@ -143,7 +112,8 @@
       file-path))
   ; see below for documentation
   (define (doc-fun name doc-string)
-    (write-doc mdcd-path-for-fun name doc-string))
+    (if (mdcd-enabled?)
+      (write-doc mdcd-path-for-fun name doc-string)))
   ; We now have enough code to start eating our own dog food.
   ; YAY.
   (doc-fun "doc-fun" "## Public: doc-fun
@@ -226,17 +196,20 @@
 
   
   (define (read-doc name)
-    (call/cc (lambda(k)
-                (let ((paths (list
-                                (mdcd-path-for-fun name)
-                                (mdcd-path-for-var name)
-                                (mdcd-path-for-syntax name)))
-                      (reader 
-                        (lambda (x) 
-                                  (if (file-exists? x)
-                                      (k (read-all x))
-                                      #f))))
-                  (for-each reader paths)))))
+    (if (mdcd-enabled?)
+      (call/cc (lambda(k)
+                  (let ((paths (list
+                                  (mdcd-path-for-fun name)
+                                  (mdcd-path-for-var name)
+                                  (mdcd-path-for-syntax name)))
+                        (reader 
+                          (lambda (x) 
+                                    (if (file-exists? x)
+                                        (k (read-all x))
+                                        #f))))
+                    (for-each reader paths))))
+      "MDCD: Disabled")) 
+      ; if get-mdcd-home is null it's been intentionally disabled.
 
 
 
