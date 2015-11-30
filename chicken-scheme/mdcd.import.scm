@@ -123,55 +123,64 @@
   ; We now have enough code to start eating our own dog food.
   ; YAY.
   (doc-fun "doc-fun" "## Public: doc-fun
-  Generates documentation for a function.
+Generates documentation for a function.
 
-  ### Paramaters:
-  * name - a symbol representing the name of the function
-  * doc-string - a markdown string documenting the function
+### Paramaters:
+* name - a symbol representing the name of the function
+* doc-string - a markdown string documenting the function
 
-  ### Returns:
-  Returns the path to the newly written file")
+### Returns:
+Returns the path to the newly written file")
 
 
   (doc-fun "doc-syntax" "## Public: doc-syntax
-  Generates documentation for a syntax change.
+Generates documentation for a syntax change.
 
-  ### Paramaters:
-  * mini-syntax-identifier - a small example of the resulting changes
-  * doc-string - a markdown string documenting the function
+### Paramaters:
+* mini-syntax-identifier - a small example of the resulting changes
+* doc-string - a markdown string documenting the function
 
-  ### Returns:
-  The path to the file where the docs were written.
+### Returns:
+The path to the file where the docs were written.
 
-  ### Notes:
-  Picking a good `mini-syntax-identifier` is tricy because syntax changes
-  typically don't have some standard symbol you can point to.
-  If, for example you were to add Ruby style array initialization 
-  syntax (e.g. [\"a\", \"b\"] ) you might choose `[...]` as your 
-  `mini-syntax-identifier`. Just make an attempt to come as close to something
-  referencable (like a method name) as possible.")
+### Notes:
+Picking a good `mini-syntax-identifier` is tricky because syntax changes
+typically don't have some standard symbol you can point to.
+If, for example you were to add Ruby style array initialization 
+syntax (e.g. [\"a\", \"b\"] ) you might choose `[...]` as your 
+`mini-syntax-identifier`. Just make an attempt to come as close to something
+referencable (like a method name) as possible.")
   (define (doc-syntax mini-syntax-identifier doc-string)
     (write-doc mdcd-path-for-syntax mini-syntax-identifier doc-string))
 
   (doc-fun "doc-var" "## Public: doc-var
-  Generates documentation for a variable.
-  Typically you would only use this for a variable of atypical significance
-  that others should be made aware of 
+Generates documentation for a variable.
+Typically you would only use this for a variable of atypical significance
+that others should be made aware of 
 
-  ### Paramaters:
-  * name - a symbol representing the name of the variable
-  * doc-string - a markdown string documenting the variable
+### Paramaters:
+* name - a symbol representing the name of the variable
+* doc-string - a markdown string documenting the variable
 
-  ### Returns:
-  The path to the file where the docs were written.")
+### Returns:
+The path to the file where the docs were written.")
   (define (doc-var name doc-string)
     (write-doc mdcd-path-for-var name doc-string))
 
   (doc-fun "show-doc" "## Public: show-doc
-  Displays the documentation for the specified key
-  ### Parameters:
-  * name - the name of the method/variable/syntax you want 
-    documentation for.")
+Sends the documentation for the specified name to standard out
+via the `display` function. Typically only used in the REPL.
+
+### Parameters:
+* name - the name of the method/variable/syntax you want 
+  documentation for.
+
+### Returns:
+... whatever `display` returns. Still not sure what that is.
+
+### Examples:
+`(show-doc \"my-function\")`
+")
   (define (show-doc name)
     (let ((response-string (read-doc name)))
       (if response-string
@@ -179,17 +188,115 @@
         (display "Undocumented"))
     )
   )
+
+  (doc-fun "show-description" "## Public: show-description
+Displays the description documentation for the specified name
+
+### Parameters:
+* name - the name of the method/variable/syntax you want 
+  documentation for.
+
+### Returns:
+The first section of documentation for the specified name.
+Typically this is the `## Public: function-name ...` block.
+
+### Examples:
+  `(show-description \"my-function\")`
+
+")
   (define (show-description name)
     (show-section name 'description))
+
+  (doc-fun "show-params" "## Public: show-params
+Displays the \"Parameters\" documentation for the specified name
+
+### Parameters:
+* name - the name of the method/variable/syntax you want 
+  documentation for.
+
+### Returns:
+The contents of the `### Parameters:...` block (if present).
+
+### Examples:
+  `(show-params \"my-function\")`
+
+")
   (define (show-params name)
     (show-section name 'parameters))
+
+  (doc-fun "show-returns" "## Public: show-returns
+Displays \"Returns\" documentation of the specified name
+
+### Parameters:
+* name - the name of the method/variable/syntax you want 
+  documentation for.
+
+### Returns:
+The contents of the `### Returns:...` block (if present).
+
+### Examples:
+  `(show-returns \"my-function\")`
+
+")
   (define (show-returns name)
     (show-section name 'returns))
+  (doc-fun "show-examples" "## Public: show-examples
+Displays \"Examples\" documentation of the specified name
+
+### Parameters:
+* name - the name of the method/variable/syntax you want 
+  documentation for.
+
+### Returns:
+The contents of the `### Examples:...` block (if present).
+
+### Examples:
+  `(show-examples \"my-function\")`
+
+")
   (define (show-examples name)
     (show-section name 'examples))
+  (doc-fun "show-notes" "## Public: show-notes
+Displays \"Returns\" documentation of the specified name
+
+### Parameters:
+* name - the name of the method/variable/syntax you want 
+  documentation for.
+
+### Returns:
+The contents of the `### Notes:...` block (if present).
+
+### Examples:
+  `(show-notes \"my-function\")`
+
+")
+
   (define (show-notes name)
     (show-section name 'notes))
+  (doc-fun "show-section" "## Public: show-section
+Displays \"Returns\" documentation of the specified name
 
+### Parameters:
+* name - the name of the method/variable/syntax you want 
+  documentation for.
+* section - a symbol that matches the name of the section
+  you want information on. The symbol must match the name of 
+  the section (case insensitive). E.g. `'paramaters` would be 
+  specified to match the `### Parameters:` section.
+
+### Returns:
+The contents of the specified block (if present).
+
+### Examples:
+To return the Parameters section of `my-function` you would:
+
+    (show-section \"my-function\" 'parameters)
+
+If you wanted to do the same for a custom section you would:
+
+    (show-section \"my-function\"  'custom-section-name)
+
+")
   (define (show-section name section)
     (let ((doc-string (read-doc name)))
       (if doc-string
@@ -200,7 +307,21 @@
       )
     )
 
-  
+  (doc-fun "read-doc" "## Public: read-doc
+Returns the documentation for the specified name as a string.
+Searches for the specified name under functions, vars, and finally
+syntax. Returs the first one that is encountered.
+
+### Parameters:
+* name - the name of the function/variable/syntax you want 
+  documentation for.
+
+### Returns:
+The complete documentation for the specified item as a string
+
+### Examples:
+`(read-doc \"my-function\")`
+")
   (define (read-doc name)
     (if (mdcd-enabled?)
       (call/cc (lambda(k)
