@@ -45,7 +45,7 @@
   ; The path to the directory where MDCD files will be stored.
   ; 
   ; ### Note:
-  ; Defaults to $HOME/mdcd/scheme/
+  ; Defaults to "<current directory>/docs"
   (define (get-mdcd-home)
     (make-absolute-pathname *mdcd-home* ""))
 
