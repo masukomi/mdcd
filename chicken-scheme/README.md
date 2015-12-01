@@ -6,15 +6,18 @@ files for public export.
 MDCD takes Common Lisps idea of [docstrings](http://en.wikipedia.org/wiki/Docstring#Lisp) 
 and takes it to the next level. 
 
-With MDCD you're not limited to the full docstring for each function. `(show-doc "my-function")` You can extract any section of the docs: 
+With MDCD you're not limited to viewing the full documentation for each function. 
+You can extract any section of it: 
+
+* everything: `(show-doc "my-function")`
 * the params: `(show-params "my-function")` 
 * what it returns: `(show-returns "my-function")`
 * example usage: `(show-example "my-function")`
 * any notes: `(show-notes "my-function")`
 * or some custom section `(show-section "my-function")`
 
-Of course, those presume that you've actually documented 
-that functionality.
+Of course, this presumes that someone's actually documented the sections you're
+trying to extract.
 
 ## Limitations
 MDCD is, itself, thoroughly documented using MDCD, but it does not 
@@ -29,7 +32,24 @@ in the default dir when you load it (see creating-docs). This is also a
 great way to see an example of what kind of files a well documented 
 project will generate.
 
-## Creating docs
+## Configuration / Setup
+
+```scheme
+	(import mdcd-config) 
+	; ^^^ must be loaded before mdcd itself.
+	(mdcd-use-default-home) 
+	; ^^^ should only be called when developing locally
+	(import mdcd)
+```
+
+Because MDCD is primarily used from the REPL (hopefully regularly)
+the methods are intentionally named in such a way that you shouldn't 
+need to prefix them, thus saving you excess typing.
+
+For more details on `(mdcd-use-default-home)` see Creating Docs below.
+
+
+## Creating Docs
 
 ### Enabling File Creation
 By default MDCD will _not_ write docs to the filesystem. This is because 
@@ -41,13 +61,20 @@ So, you need to turn it on by giving it a list of directories that tell it
 where to write to. If, for example you want it to write to the "docs" 
 directory in the current folder you could say: 
 
+```scheme
 	(set-mdcd-home 
-		(append (string-split (current-directory) "/") '("docs")))
+		(append 
+			(string-split (current-directory) "/")
+			'("docs")))
+	; set-mdcd-home is part of mdcd-config
+```
 
 Because that's generally what you want, there's also a convenience function for
-it.
+it:
 
+```scheme
 	(mdcd-use-default-home)
+```
 
 ### Documenting your code
 
@@ -62,10 +89,12 @@ Each of these take 2 parameters:
 * the name of the function / variable / syntax
 * a string containing the documentation.
 
+```scheme
 	(doc-fun "my-function" "some markdown documentation")
+```
 
 The documentation is divided into section by its headers. It is suggested that
-you use H2s for the top level description, and H3s for the detailed parts. See
+you use H2s (`## Foo`) for the top level description, and H3s (`### Bar`) for the detailed parts. See
 the example below.
 
 In order to intelligently extract subsections of your documentation for scoped 
@@ -85,10 +114,12 @@ line of a function's docs, but it's recommended that you go with
 "Public" or "Private" followed by a method signature. See MDCD's 
 documentation for examples.
 
-Please note that, with the exception of "Description" **these are all plural**.
+Please note that, with the exception of "Description", **all headers are plural**.
 MDCD is looking for specific strings when trying to find the appropriate
-section. Keeping everything plural makes it consistent and easier to find.
+section. Keeping everything plural makes it consistent and easier to create
+without mistakes.
 
+```scheme
 	(doc-fun "greet"
 	  "## Public: greet [name]
 	Generates a greeting string.
@@ -104,7 +135,7 @@ section. Keeping everything plural makes it consistent and easier to find.
 	
 	### Notes:
 	This is *obviously* a contrived example.")
-	
+```
 
 Note that in the example above the `## Public: greet [name]` section is the 
 "description" because it comes first. It is also what would be returned if 
@@ -142,7 +173,7 @@ and that any new functionality you add has a unit test to confirm it works.
 
 ## About
 MDCD was written by [masukomi](http://masukomi.org), because I love Markdown,
-feel that good documentation is invaluable to the users of any library (and the
-creators of that library months after they're written it) and wanted a better
-tool for generating those docs.
+and Common Lisp's "docstrings", and feel that good documentation is invaluable 
+to the creators, and users of any codebase. I wanted a better
+tool for generating those docs. So, I wrote MDCD.
 
