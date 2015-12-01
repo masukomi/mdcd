@@ -20,10 +20,6 @@
   (mdcd-disable)
   (test-assert "disable"
       (not (mdcd-enabled?)))
-
-
-  ; reset it to what it was (FIXME)
-
 )
 
 ;; IMPORTANT! The following ensures nightly automated tests can
