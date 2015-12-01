@@ -22,15 +22,14 @@ trying to extract.
 ## Limitations
 MDCD is, itself, thoroughly documented using MDCD, but it does not 
 *yet* convert the generated Markdown docs into static HTML. As a 
-result, its online documentation is somewhat lacking. 
+result, its online documentation... could be better.
 
 The irony is not lost. 
 
-In the meantime, the documentation in `mdcd.import.scm` is pretty complete, 
-written in Markdown, and will auto-generate `.md` files for its functions 
-in the default dir when you load it (see creating-docs). This is also a 
-great way to see an example of what kind of files a well documented 
-project will generate.
+In the meantime, you can [view the rendered markdown on github](https://github.com/masukomi/mdcd/tree/master/docs/functions) It also serves as an example of 
+the files that mdcd creates, since MDCD uses MDCD for its documentation (of
+course).
+
 
 ## Configuration / Setup
 
