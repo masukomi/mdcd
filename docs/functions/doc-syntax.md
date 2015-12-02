@@ -1,7 +1,7 @@
 ## Public: doc-syntax
 Generates documentation for a syntax change.
 
-### Paramaters:
+### Parameters:
 * mini-syntax-identifier - a small example of the resulting changes
 * doc-string - a markdown string documenting the function
 

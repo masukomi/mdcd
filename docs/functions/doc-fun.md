@@ -1,7 +1,7 @@
 ## Public: doc-fun
 Generates documentation for a function.
 
-### Paramaters:
+### Parameters:
 * name - a symbol representing the name of the function
 * doc-string - a markdown string documenting the function
 

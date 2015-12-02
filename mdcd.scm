@@ -65,7 +65,7 @@
 
   ; ## Public: mdcd-file-for
   ; Provides the file-path for a given identifier. 
-  ; ### Paramaters:
+  ; ### Parameters:
   ; * identifier - the function/variable/syntax you want documentation for.
   ; ### Returns:
   ; The file-path where the identifiers docs should be written / found.
@@ -81,7 +81,7 @@
   ; ## Private: mdcd-write-doc
   ; Writes the specified doc-string to the specified file-path
   ;
-  ; ### Paramaters:
+  ; ### Parameters:
   ; * doc-string - the string of documentation
   ; * file-path - the path to the file that should be created / replaced
   ;
@@ -125,7 +125,7 @@
   (doc-fun "doc-fun" "## Public: doc-fun
 Generates documentation for a function.
 
-### Paramaters:
+### Parameters:
 * name - a symbol representing the name of the function
 * doc-string - a markdown string documenting the function
 
@@ -136,7 +136,7 @@ Returns the path to the newly written file")
   (doc-fun "doc-syntax" "## Public: doc-syntax
 Generates documentation for a syntax change.
 
-### Paramaters:
+### Parameters:
 * mini-syntax-identifier - a small example of the resulting changes
 * doc-string - a markdown string documenting the function
 
@@ -158,7 +158,7 @@ Generates documentation for a variable.
 Typically you would only use this for a variable of atypical significance
 that others should be made aware of 
 
-### Paramaters:
+### Parameters:
 * name - a symbol representing the name of the variable
 * doc-string - a markdown string documenting the variable
 
