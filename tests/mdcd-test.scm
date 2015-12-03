@@ -70,9 +70,29 @@ Hah!")
                 	manual-var-path docfun-var-path)
           	  (test "syntax stored in correct dir"
                 	manual-syntax-path docfun-syntax-path)
-
         	)
       	  )
+		  (test-group "subdirectories"
+			(let ((manual-fun-path (string-concatenate (list
+                         	 (get-mdcd-home) ; ends with a /
+                         	 "my-module/functions/test-mdcd-docfun.md")))
+              	  (manual-var-path (string-concatenate (list
+                         	 (get-mdcd-home) ; ends with a /
+                         	 "my-module/variables/test-mdcd-docfun.md")))
+              	  (manual-syntax-path (string-concatenate (list
+                         	 (get-mdcd-home) ; ends with a /
+                         	 "my-module/syntax/test-mdcd-docfun.md"))))
+          	  (test "functions stored in correct dir"
+                	manual-fun-path 
+                	(mdcd-path-for-fun "test-mdcd-docfun" "my-module"))
+          	  (test "variable stored in correct dir" 
+                	manual-var-path 
+                	(mdcd-path-for-var "test-mdcd-docfun" "my-module"))
+          	  (test "syntax stored in correct dir"
+                	manual-syntax-path 
+                	(mdcd-path-for-syntax "test-mdcd-docfun" "my-module"))
+        	)
+		  )
       	  (test-group "naming"
         	; doesn't do space removal because you can't name
         	; anything with a space in scheme

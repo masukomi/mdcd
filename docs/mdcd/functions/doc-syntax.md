@@ -1,9 +1,10 @@
-## Public: doc-syntax
+## Public: doc-syntax mini-syntax-identifier doc-string [module-name]
 Generates documentation for a syntax change.
 
 ### Parameters:
 * mini-syntax-identifier - a small example of the resulting changes
 * doc-string - a markdown string documenting the function
+* module-name - (optional) name of the module this lives in
 
 ### Returns:
 The path to the file where the docs were written.

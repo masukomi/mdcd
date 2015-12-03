@@ -36,6 +36,7 @@
     mdcd-path-for-fun
     mdcd-path-for-syntax
 
+
    )
   (import chicken)
   (import scheme)
@@ -44,6 +45,7 @@
   (use data-structures)
   (use utils); for read-all procedure
   (require-extension regex)
+  (use srfi-13)
   (import mdcd-config)
   (import (prefix mdcd-sections ms:))
 
@@ -63,18 +65,9 @@
     ; to keep the files as something meaningful to humans.
     (string-substitute* name '(("[!%&*+./:<=>?@~ ^$]+" . "_"))))
 
-  ; ## Public: mdcd-file-for
-  ; Provides the file-path for a given identifier. 
-  ; ### Parameters:
-  ; * identifier - the function/variable/syntax you want documentation for.
-  ; ### Returns:
-  ; The file-path where the identifiers docs should be written / found.
-  
-  ; TODO: make subfolder be an array defaulting to an empty one
-  (define (mdcd-file-for identifier #!optional (subfolder ""))
+  (define (mdcd-file-for identifier subfolder #!optional (module-name '()))
     (make-absolute-pathname 
-      (list (get-mdcd-home) 
-        subfolder)
+      (list (get-mdcd-home) module-name subfolder)
       (mdcd-name-cleaner identifier)
       "md"))
 
@@ -101,44 +94,47 @@
       #f)
     )
 
-  (define (write-doc path-function name doc-string)
-    (let ((file-path (path-function name)))
+  (define (write-doc path-function name doc-string #!optional (module-name ""))
+    (let ((file-path (path-function name module-name)))
       (mdcd-write-doc doc-string file-path)
       file-path))
 
-  (define (mdcd-path-for-var name)
-    (mdcd-file-for name "variables"))
+  (define (mdcd-path-for-var name #!optional (module-name ""))
+    (mdcd-file-for name "variables" module-name))
 
-  (define (mdcd-path-for-fun name)
-    (mdcd-file-for name "functions"))
+  (define (mdcd-path-for-fun name #!optional (module-name ""))
+    (mdcd-file-for name "functions" module-name))
 
-  (define (mdcd-path-for-syntax name)
-    (mdcd-file-for name "syntax"))
+  (define (mdcd-path-for-syntax name #!optional (module-name ""))
+    (mdcd-file-for name "syntax" module-name))
 
   
   ; see below for documentation
-  (define (doc-fun name doc-string)
+  (define (doc-fun name doc-string #!optional (module-name ""))
     (if (mdcd-enabled?)
-      (write-doc mdcd-path-for-fun name doc-string)))
+      (write-doc mdcd-path-for-fun name doc-string module-name)))
   ; We now have enough code to start eating our own dog food.
   ; YAY.
-  (doc-fun "doc-fun" "## Public: doc-fun
+  (doc-fun "doc-fun" "## Public: doc-fun name doc-string [module-name]
 Generates documentation for a function.
 
 ### Parameters:
 * name - a symbol representing the name of the function
 * doc-string - a markdown string documenting the function
+* module-name - (optional) name of the module this lives in
 
 ### Returns:
-Returns the path to the newly written file")
+Returns the path to the newly written file" "mdcd")
 
 
-  (doc-fun "doc-syntax" "## Public: doc-syntax
+  (doc-fun "doc-syntax" 
+"## Public: doc-syntax mini-syntax-identifier doc-string [module-name]
 Generates documentation for a syntax change.
 
 ### Parameters:
 * mini-syntax-identifier - a small example of the resulting changes
 * doc-string - a markdown string documenting the function
+* module-name - (optional) name of the module this lives in
 
 ### Returns:
 The path to the file where the docs were written.
@@ -149,11 +145,15 @@ typically don't have some standard symbol you can point to.
 If, for example you were to add Ruby style array initialization 
 syntax (e.g. [\"a\", \"b\"] ) you might choose `[...]` as your 
 `mini-syntax-identifier`. Just make an attempt to come as close to something
-referencable (like a method name) as possible.")
-  (define (doc-syntax mini-syntax-identifier doc-string)
-    (write-doc mdcd-path-for-syntax mini-syntax-identifier doc-string))
+referencable (like a method name) as possible." "mdcd")
+  (define (doc-syntax mini-syntax-identifier doc-string #!optional (module-name ""))
+    (write-doc 
+      mdcd-path-for-syntax 
+      mini-syntax-identifier 
+      doc-string 
+      module-name))
 
-  (doc-fun "doc-var" "## Public: doc-var
+  (doc-fun "doc-var" "## Public: doc-var name doc-string [module-name]
 Generates documentation for a variable.
 Typically you would only use this for a variable of atypical significance
 that others should be made aware of 
@@ -161,11 +161,13 @@ that others should be made aware of
 ### Parameters:
 * name - a symbol representing the name of the variable
 * doc-string - a markdown string documenting the variable
+* module-name - (optional) name of the module this lives in
+
 
 ### Returns:
-The path to the file where the docs were written.")
-  (define (doc-var name doc-string)
-    (write-doc mdcd-path-for-var name doc-string))
+The path to the file where the docs were written." "mdcd")
+  (define (doc-var name doc-string #!optional (module-name ""))
+    (write-doc mdcd-path-for-var name doc-string module-name))
 
   (doc-fun "show-doc" "## Public: show-doc
 Sends the documentation for the specified name to standard out
@@ -180,7 +182,7 @@ via the `display` function. Typically only used in the REPL.
 
 ### Examples:
 `(show-doc \"my-function\")`
-")
+" "mdcd")
   (define (show-doc name)
     (let ((response-string (read-doc name)))
       (if response-string
@@ -203,7 +205,7 @@ Typically this is the `## Public: function-name ...` block.
 ### Examples:
   `(show-description \"my-function\")`
 
-")
+" "mdcd")
   (define (show-description name)
     (show-section name 'description))
 
@@ -220,7 +222,7 @@ The contents of the `### Parameters:...` block (if present).
 ### Examples:
   `(show-params \"my-function\")`
 
-")
+" "mdcd")
   (define (show-params name)
     (show-section name 'parameters))
 
@@ -237,7 +239,7 @@ The contents of the `### Returns:...` block (if present).
 ### Examples:
   `(show-returns \"my-function\")`
 
-")
+" "mdcd")
   (define (show-returns name)
     (show-section name 'returns))
   (doc-fun "show-examples" "## Public: show-examples
@@ -253,7 +255,7 @@ The contents of the `### Examples:...` block (if present).
 ### Examples:
   `(show-examples \"my-function\")`
 
-")
+" "mdcd")
   (define (show-examples name)
     (show-section name 'examples))
   (doc-fun "show-notes" "## Public: show-notes
@@ -269,7 +271,7 @@ The contents of the `### Notes:...` block (if present).
 ### Examples:
   `(show-notes \"my-function\")`
 
-")
+" "mdcd")
 
   (define (show-notes name)
     (show-section name 'notes))
@@ -296,7 +298,7 @@ If you wanted to do the same for a custom section you would:
 
     (show-section \"my-function\"  'custom-section-name)
 
-")
+" "mdcd")
   (define (show-section name section)
     (let ((doc-string (read-doc name)))
       (if doc-string
@@ -321,7 +323,7 @@ The complete documentation for the specified item as a string
 
 ### Examples:
 `(read-doc \"my-function\")`
-")
+" "mdcd")
   (define (read-doc name)
     (if (mdcd-enabled?)
       (call/cc (lambda(k)

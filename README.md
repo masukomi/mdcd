@@ -83,13 +83,16 @@ Documenting your code is pretty simple. You call one of 3 functions:
 * `doc-var` ( for documenting variables )
 * `doc-syntax` ( for documenting syntax )
 
-Each of these take 2 parameters: 
+Each of these take 2 (or 3) parameters: 
 
 * the name of the function / variable / syntax
 * a string containing the documentation.
+* (optional) the module name where the thing is
 
 ```scheme
 	(doc-fun "my-function" "some markdown documentation")
+	; or...
+	(doc-fun "my-function" "some markdown documentation" "my-module")
 ```
 
 The documentation is divided into section by its headers. It is suggested that
