@@ -17,21 +17,8 @@
   (use data-structures)
   (use srfi-13)
   (use srfi-1)
+  (use listicles)
   (require-extension regex)
-
-  ;#####################################
-  ; NOT EVEN REMOTELY PUBLIC PROCEDURES
-  (define (nth n lst) ;ugh... reimplimenting nth here?
-    (if (or (> n (- (length lst) 1)) (< n 0))
-      (error 'nth "Index out of bounds.")
-      (if (eq? n 0)
-        (car lst)
-        (nth (- n 1) (cdr lst)))))
-  ; ugh... and range
-  (define (range a b #!optional (increment 1) (existing '()))
-    (if (if (> increment 0) (<= a b) (>= a b))
-      (cons a (range (+ increment a) b increment existing) )
-      existing))
 
   (define (header-indexes lines)
     (let ((line-headerness-pairs (header-line-truthyness lines)))

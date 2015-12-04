@@ -192,12 +192,26 @@ Hah!
                 	(get-doc-section show-examples docfun-fun-path test-doc-string))
       	  )
       	  (test-group "read-doc"
-        	(mdcd-disable)
-        	(test "disabled when home is null"
-              	  "MDCD: Disabled"
-              	  (read-doc "test-mdcd-docfun" ))
-        	
-      	  )
+      	  	(test-group "multi-file"
+      	  		(remove-file docfun-fun-path)
+          	  	(doc-fun "test-mdcd-docfun" test-doc-string)
+          	  	(test-assert (file-exists? docfun-fun-path))
+				(let ((docfun-foo-fun-path 
+						(mdcd-path-for-fun "test-mdcd-docfun" "foo" )))
+          	  		(doc-fun "test-mdcd-docfun" test-doc-string "foo")
+          	  		; now there should be two of them
+          	  		(test-assert (file-exists? docfun-foo-fun-path))
+          	  		(test "two files with same name returns two files"
+          	  		  2
+          	  		  (length (read-doc 
+          	  		  			"test-mdcd-docfun.md")))
+          	  		(remove-file docfun-foo-fun-path)
+          	  		))
+            (test-group "disabled"
+				(mdcd-disable)
+        		(test "disabled when home is null"
+              	  	  '("MDCD: Disabled")
+              	  	  (read-doc "test-mdcd-docfun" ))))
 
       	  (mdcd-disable)
     	)

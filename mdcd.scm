@@ -36,7 +36,8 @@
     mdcd-path-for-fun
     mdcd-path-for-syntax
 
-
+    mdcd-name-cleaner
+    
    )
   (import chicken)
   (import scheme)
@@ -46,8 +47,12 @@
   (use utils); for read-all procedure
   (require-extension regex)
   (use srfi-13)
+  (use extras)
+  (use listicles)
+  ;(import srfi-1)
   (import mdcd-config)
   (import (prefix mdcd-sections ms:))
+  (import posix)
 
   ;(use symbol-utils); for unbound?
 
@@ -64,6 +69,9 @@
     ; in overlap. I could hash the name but I would prefer
     ; to keep the files as something meaningful to humans.
     (string-substitute* name '(("[!%&*+./:<=>?@~ ^$]+" . "_"))))
+
+  (define (mdcd-file-name name)
+    (string-concatenate (list (mdcd-name-cleaner name) ".md")))
 
   (define (mdcd-file-for identifier subfolder #!optional (module-name '()))
     (make-absolute-pathname 
@@ -184,12 +192,11 @@ via the `display` function. Typically only used in the REPL.
 `(show-doc \"my-function\")`
 " "mdcd")
   (define (show-doc name)
-    (let ((response-string (read-doc name)))
+    (let ((response-string (read-and-choose-doc (mdcd-file-name name))))
       (if response-string
         (display response-string)
-        (display "Undocumented"))
-    )
-  )
+        (display "Undocumented"));<-- can't happen
+    ))
 
   (doc-fun "show-description" "## Public: show-description
 Displays the description documentation for the specified name
@@ -300,7 +307,7 @@ If you wanted to do the same for a custom section you would:
 
 " "mdcd")
   (define (show-section name section)
-    (let ((doc-string (read-doc name)))
+    (let ((doc-string (read-and-choose-doc (mdcd-file-name name))))
       (if doc-string
         (for-each (lambda(x)(print x))
                   (ms:extract-section section doc-string))
@@ -308,6 +315,33 @@ If you wanted to do the same for a custom section you would:
         )
       )
     )
+
+    (define (pick-a-number min max)
+      (write-line "Which one?")
+      (let ((n (read-line)))
+        (if n
+          (let ((num (string->number n)))
+            (if (and num (<= num max) (>= num min))
+              num
+              (pick-a-number min max))))))
+
+
+    (define (choose-doc docs)
+          (if (eq? 1 (length docs))
+            (car docs)
+            (begin
+              (write-line (sprintf 
+                            "there were ~A docs matching that name" 
+                            (length docs)))
+              (let ((idx -1))
+                (for-each (lambda(x) 
+                            (begin 
+                              (set! idx (+ idx 1))
+                              (print (sprintf "~A) ~A" idx 
+                                     (car (string-split x "\n" #t))
+                                     ))))
+                  docs))
+              (nth (pick-a-number 0 (length docs)) docs))))
 
   (doc-fun "read-doc" "## Public: read-doc
 Returns the documentation for the specified name as a string.
@@ -326,20 +360,24 @@ The complete documentation for the specified item as a string
 " "mdcd")
   (define (read-doc name)
     (if (mdcd-enabled?)
-      (call/cc (lambda(k)
-                  (let ((paths (list
-                                  (mdcd-path-for-fun name)
-                                  (mdcd-path-for-var name)
-                                  (mdcd-path-for-syntax name)))
-                        (reader 
-                          (lambda (x) 
-                                    (if (file-exists? x)
-                                        (k (read-all x))
-                                        #f))))
-                    (for-each reader paths))))
-      "MDCD: Disabled")) 
+       (let ((paths (find-paths-with-name name)))
+        (if (eq? 0 (length paths))
+          '("Undefined")
+          (map (lambda(x)(read-all x)) paths))
+          ;TODO modify both ^^^ cases to return lists
+       )
+      '("MDCD: Disabled")))
       ; if get-mdcd-home is null it's been intentionally disabled.
 
-
+    (define (read-and-choose-doc name)
+      (let ((docs (read-doc name)))
+          (if (> (length docs) 0)
+            (choose-doc docs)
+            (car docs))))
+    
+    (define (find-paths-with-name name)
+      (find-files (get-mdcd-home)
+          test: (lambda(filepath)
+            (equal? name (car (reverse (string-split filepath "/")))))))
 
 ); END module mdcd
