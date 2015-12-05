@@ -1,3 +1,6 @@
+(compile -s -O3 -d1 listicles.scm -j listicles)
+(compile -s listicles.import.scm -O3 -d0)
+
 (compile -s -O3 -d1 mdcd-config.scm -j mdcd-config)
 (compile -s mdcd-config.import.scm -O3 -d0)
 
@@ -7,14 +10,12 @@
 (compile -s -O3 -d1 mdcd.scm -j mdcd)
 (compile -s mdcd.import.scm -O3 -d0)
 
-(compile -s -O3 -d1 listicles.scm -j mdcd)
-(compile -s listicles.import.scm -O3 -d0)
-
 (install-extension
  ;; Name of your extension:
  'mdcd
  ;; Files to install for your extension:
- '("listicles.so" "listicles.import.so" "mdcd-config.so" "mdcd-config.import.so" 
+ '("listicles.so" "listicles.import.so" 
+   "mdcd-config.so" "mdcd-config.import.so" 
    "mdcd-sections.so" "mdcd-sections.import.so"
    "mdcd.so" "mdcd.import.so")
  ;; Assoc list with properties for your extension:
