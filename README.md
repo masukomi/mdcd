@@ -95,6 +95,11 @@ Each of these take 2 (or 3) parameters:
 	(doc-fun "my-function" "some markdown documentation" "my-module")
 ```
 
+Note: If the thing you're documenting is contained within a module it's important
+to specify that when calling any of the `doc-*` functions. It will help keep the
+files from mixing together, and multiple functions with the same name won't
+overwrite each other's files.
+
 The documentation is divided into section by its headers. It is suggested that
 you use H2s (`## Foo`) for the top level description, and H3s (`### Bar`) for the detailed parts. See
 the example below.
@@ -157,6 +162,10 @@ part of the docs you want to see.
 
 
 	(show-doc "my-function") ;=> simplest usage 
+
+Note: When you call `show-*` and MDCD encounters multiple files with the same 
+name it will show you the first line of each and ask you to choose which one to 
+display the details of.
 
 ### Viewing Custom Sections
 
