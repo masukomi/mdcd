@@ -19,4 +19,4 @@
    "mdcd-sections.so" "mdcd-sections.import.so"
    "mdcd.so" "mdcd.import.so")
  ;; Assoc list with properties for your extension:
- '((version "0.5")))
+ '((version "1.1")))
