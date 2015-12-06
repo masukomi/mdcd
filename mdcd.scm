@@ -29,15 +29,9 @@
     show-notes
     show-section
 
-    
-    ; the following are only exported for 
-    ; testing purposes. please delete before creating eggs.
     mdcd-path-for-var
     mdcd-path-for-fun
     mdcd-path-for-syntax
-
-    mdcd-name-cleaner
-    
    )
   (import chicken)
   (import scheme)
@@ -58,63 +52,17 @@
 
   
 
-  ; ## Private: mdcd-name-cleaner
-  ; converts method and variable names into something more filesystem friendly
-  ; ### Parameters:
-  ; * name - the name to be cleaned.
-  ; ### Returns:
-  ; The "cleaned" name.
-  (define (mdcd-name-cleaner name)
-    ; "[^\\w_\-]+" seemed like it was too likely to result
-    ; in overlap. I could hash the name but I would prefer
-    ; to keep the files as something meaningful to humans.
-    (string-substitute* name '(("[!%&*+./:<=>?@~ ^$]+" . "_"))))
 
-  (define (mdcd-file-name name)
-    (string-concatenate (list (mdcd-name-cleaner name) ".md")))
-
-  (define (mdcd-file-for identifier subfolder #!optional (module-name '()))
-    (make-absolute-pathname 
-      (list (get-mdcd-home) module-name subfolder)
-      (mdcd-name-cleaner identifier)
-      "md"))
-
-  ; ## Private: mdcd-write-doc
-  ; Writes the specified doc-string to the specified file-path
-  ;
-  ; ### Parameters:
-  ; * doc-string - the string of documentation
-  ; * file-path - the path to the file that should be created / replaced
-  ;
-  ; ### Returns:
-  ; Returns #t if successful
-  (define (mdcd-write-doc doc-string file-path)
-    (if (mdcd-enabled?)
-      (begin
-       (if (not (directory-exists? (pathname? file-path)))
-        (create-pathname-directory file-path))
-       (with-output-to-file file-path
-        (lambda ()
-         (display doc-string)
-         (newline)))
-
-        #t)
-      #f)
-    )
-
-  (define (write-doc path-function name doc-string #!optional (module-name ""))
-    (let ((file-path (path-function name module-name)))
-      (mdcd-write-doc doc-string file-path)
-      file-path))
 
   (define (mdcd-path-for-var name #!optional (module-name ""))
     (mdcd-file-for name "variables" module-name))
 
+
   (define (mdcd-path-for-fun name #!optional (module-name ""))
     (mdcd-file-for name "functions" module-name))
 
-  (define (mdcd-path-for-syntax name #!optional (module-name ""))
-    (mdcd-file-for name "syntax" module-name))
+  (define (mdcd-path-for-syntax mini-syntax-identifier #!optional (module-name ""))
+    (mdcd-file-for mini-syntax-identifier "syntax" module-name))
 
   
   ; see below for documentation
@@ -123,7 +71,7 @@
       (write-doc mdcd-path-for-fun name doc-string module-name)))
   ; We now have enough code to start eating our own dog food.
   ; YAY.
-  (doc-fun "doc-fun" "## Public: doc-fun name doc-string [module-name]
+  (doc-fun "doc-fun" "## Public: (doc-fun name doc-string [module-name])
 Generates documentation for a function.
 
 ### Parameters:
@@ -136,7 +84,7 @@ Returns the path to the newly written file" "mdcd")
 
 
   (doc-fun "doc-syntax" 
-"## Public: doc-syntax mini-syntax-identifier doc-string [module-name]
+"## Public: (doc-syntax mini-syntax-identifier doc-string [module-name])
 Generates documentation for a syntax change.
 
 ### Parameters:
@@ -161,7 +109,7 @@ referencable (like a method name) as possible." "mdcd")
       doc-string 
       module-name))
 
-  (doc-fun "doc-var" "## Public: doc-var name doc-string [module-name]
+  (doc-fun "doc-var" "## Public: (doc-var name doc-string [module-name])
 Generates documentation for a variable.
 Typically you would only use this for a variable of atypical significance
 that others should be made aware of 
@@ -177,7 +125,7 @@ The path to the file where the docs were written." "mdcd")
   (define (doc-var name doc-string #!optional (module-name ""))
     (write-doc mdcd-path-for-var name doc-string module-name))
 
-  (doc-fun "show-doc" "## Public: show-doc
+  (doc-fun "show-doc" "## Public: (show-doc name)
 Sends the documentation for the specified name to standard out
 via the `display` function. Typically only used in the REPL.
 
@@ -198,7 +146,7 @@ via the `display` function. Typically only used in the REPL.
         (display "Undocumented"));<-- can't happen
     ))
 
-  (doc-fun "show-description" "## Public: show-description
+  (doc-fun "show-description" "## Public: (show-description name)
 Displays the description documentation for the specified name
 
 ### Parameters:
@@ -216,7 +164,7 @@ Typically this is the `## Public: function-name ...` block.
   (define (show-description name)
     (show-section name 'description))
 
-  (doc-fun "show-params" "## Public: show-params
+  (doc-fun "show-params" "## Public: (show-params name)
 Displays the \"Parameters\" documentation for the specified name
 
 ### Parameters:
@@ -233,7 +181,7 @@ The contents of the `### Parameters:...` block (if present).
   (define (show-params name)
     (show-section name 'parameters))
 
-  (doc-fun "show-returns" "## Public: show-returns
+  (doc-fun "show-returns" "## Public: (show-returns name)
 Displays \"Returns\" documentation of the specified name
 
 ### Parameters:
@@ -249,7 +197,7 @@ The contents of the `### Returns:...` block (if present).
 " "mdcd")
   (define (show-returns name)
     (show-section name 'returns))
-  (doc-fun "show-examples" "## Public: show-examples
+  (doc-fun "show-examples" "## Public: (show-examples name)
 Displays \"Examples\" documentation of the specified name
 
 ### Parameters:
@@ -265,7 +213,7 @@ The contents of the `### Examples:...` block (if present).
 " "mdcd")
   (define (show-examples name)
     (show-section name 'examples))
-  (doc-fun "show-notes" "## Public: show-notes
+  (doc-fun "show-notes" "## Public: (show-notes name)
 Displays \"Returns\" documentation of the specified name
 
 ### Parameters:
@@ -282,7 +230,7 @@ The contents of the `### Notes:...` block (if present).
 
   (define (show-notes name)
     (show-section name 'notes))
-  (doc-fun "show-section" "## Public: show-section
+  (doc-fun "show-section" "## Public: (show-section name section)
 Displays \"Returns\" documentation of the specified name
 
 ### Parameters:
@@ -316,6 +264,35 @@ If you wanted to do the same for a custom section you would:
       )
     )
 
+  (doc-fun "read-doc" "## Public: (read-doc name)
+Returns the documentation for the specified name as a string.
+Searches for the specified name under functions, vars, and finally
+syntax. Returs the first one that is encountered.
+
+### Parameters:
+* name - the name of the function/variable/syntax you want 
+  documentation for.
+
+### Returns:
+The complete documentation for the specified item as a string
+
+### Examples:
+`(read-doc \"my-function\")`
+" "mdcd")
+  (define (read-doc name)
+    (if (mdcd-enabled?)
+       (let ((paths (find-paths-with-name name)))
+        (if (eq? 0 (length paths))
+          '("Undefined")
+          (map (lambda(x)(read-all x)) paths))
+          ;TODO modify both ^^^ cases to return lists
+       )
+      '("MDCD: Disabled")))
+      ; if get-mdcd-home is null it's been intentionally disabled.
+
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;;; Private Methods
     (define (pick-a-number min max)
       (write-line "Which one?")
       (let ((n (read-line)))
@@ -343,41 +320,126 @@ If you wanted to do the same for a custom section you would:
                   docs))
               (nth (pick-a-number 0 (length docs)) docs))))
 
-  (doc-fun "read-doc" "## Public: read-doc
-Returns the documentation for the specified name as a string.
-Searches for the specified name under functions, vars, and finally
-syntax. Returs the first one that is encountered.
-
-### Parameters:
-* name - the name of the function/variable/syntax you want 
-  documentation for.
-
-### Returns:
-The complete documentation for the specified item as a string
-
-### Examples:
-`(read-doc \"my-function\")`
-" "mdcd")
-  (define (read-doc name)
-    (if (mdcd-enabled?)
-       (let ((paths (find-paths-with-name name)))
-        (if (eq? 0 (length paths))
-          '("Undefined")
-          (map (lambda(x)(read-all x)) paths))
-          ;TODO modify both ^^^ cases to return lists
-       )
-      '("MDCD: Disabled")))
-      ; if get-mdcd-home is null it's been intentionally disabled.
-
     (define (read-and-choose-doc name)
       (let ((docs (read-doc name)))
           (if (> (length docs) 0)
             (choose-doc docs)
             (car docs))))
-    
+
     (define (find-paths-with-name name)
       (find-files (get-mdcd-home)
           test: (lambda(filepath)
             (equal? name (car (reverse (string-split filepath "/")))))))
+
+  ; ## Private: mdcd-write-doc
+  ; Writes the specified doc-string to the specified file-path
+  ;
+  ; ### Parameters:
+  ; * doc-string - the string of documentation
+  ; * file-path - the path to the file that should be created / replaced
+  ;
+  ; ### Returns:
+  ; Returns #t if successful
+  (define (mdcd-write-doc doc-string file-path)
+    (if (mdcd-enabled?)
+      (begin
+       (if (not (directory-exists? (pathname? file-path)))
+        (create-pathname-directory file-path))
+       (with-output-to-file file-path
+        (lambda ()
+         (display doc-string)
+         (newline)))
+
+        #t)
+      #f))
+
+  (define (write-doc path-function name doc-string #!optional (module-name ""))
+    (let ((file-path (path-function name module-name)))
+      (mdcd-write-doc doc-string file-path)
+      file-path))
+
+
+  ; ## Private: mdcd-name-cleaner
+  ; converts method and variable names into something more filesystem friendly
+  ; ### Parameters:
+  ; * name - the name to be cleaned.
+  ; ### Returns:
+  ; The "cleaned" name.
+  (define (mdcd-name-cleaner name)
+    ; "[^\\w_\-]+" seemed like it was too likely to result
+    ; in overlap. I could hash the name but I would prefer
+    ; to keep the files as something meaningful to humans.
+    (string-substitute* name '(("[!%&*+./:<=>?@~ ^$]+" . "_"))))
+
+  (define (mdcd-file-name name)
+    (string-concatenate (list (mdcd-name-cleaner name) ".md")))
+
+  (define (mdcd-file-for identifier subfolder #!optional (module-name '()))
+    (make-absolute-pathname 
+      (list (get-mdcd-home) module-name subfolder)
+      (mdcd-name-cleaner identifier)
+      "md"))
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; Documentation that would have come earlier but the doc-fun
+  ;; method wasn't loaded yet, and putting them in the middle of the 
+  ;; doc would have been even weirder than putting them at the bottom.
+  (doc-fun "mdcd-path-for-var"
+"## Public: (mdcd-path-for-var name [module-name])
+Calculates the path where the documentation for the specified variable will/does live.
+
+### Parameters:
+* name - a symbol representing the name of the variable
+* module-name - (optional) name of the module this lives in
+
+### Returns:
+A string representation of the absolute path to the file.
+
+### Examples:
+
+```scheme
+(mdcd-path-for-var \"my-var\" \"my-module\")
+;=> /path/to/mdcd/home/variables/my-module/my-var.md
+```
+" "mdcd")
+
+  (doc-fun "mdcd-path-for-fun"
+"## Public: (mdcd-path-for-fun name [module-name])
+Calculates the path where the documentation for the specified function will/does live.
+
+### Parameters:
+* name - a symbol representing the name of the function
+* module-name - (optional) name of the module this lives in
+
+### Returns:
+A string representation of the absolute path to the file.
+
+### Examples:
+
+```scheme
+(mdcd-path-for-var \"my-function\" \"my-module\")
+;=> /path/to/mdcd/home/functions/my-module/my-function.md
+```
+" "mdcd")
+
+  (doc-fun "mdcd-path-for-syntax"
+"## Public: (mdcd-path-for-fun mini-syntax-identifier [module-name])
+Calculates the path where the documentation for the specified syntax will/does live.
+
+### Parameters:
+* mini-syntax-identifier - a small example of the resulting changes
+* module-name - (optional) name of the module this lives in
+
+### Returns:
+A string representation of the absolute path to the file.
+
+### Examples:
+
+```scheme
+(mdcd-path-for-var \"my-syntax\" \"my-module\")
+;=> /path/to/mdcd/home/syntax/my-module/my-syntax.md
+```
+" "mdcd")
+
 
 ); END module mdcd
