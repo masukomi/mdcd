@@ -101,8 +101,10 @@ files from mixing together, and multiple functions with the same name won't
 overwrite each other's files.
 
 The documentation is divided into section by its headers. It is suggested that
-you use H2s (`## Foo`) for the top level description, and H3s (`### Bar`) for the detailed parts. See
-the example below.
+you use H2s (`## Foo`) for the top level description, and H3s (`### Bar`) for 
+the detailed parts. You don't want to use H1s for 2 reasons. One, they tend to
+be far too large in common usage and Two, the H1s will be used when generating
+roll-up documentation for the Chicken Scheme Wiki. See the example below.
 
 In order to intelligently extract subsections of your documentation for scoped 
 retrieval MDCD uses a convention of Markdown headers to denotethe start of each 
@@ -147,6 +149,10 @@ without mistakes.
 Note that in the example above the `## Public: greet [name]` section is the 
 "description" because it comes first. It is also what would be returned if 
 you called `(show-description "greet")`.
+
+
+### Generating Docs for the Chicken Scheme Wiki
+
 
 
 ## Viewing Docs
