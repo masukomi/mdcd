@@ -1,0 +1,10 @@
+## [procedure] (mdcd-use-default-home)
+Sets MDCD's home directory to be the `docs` directory under the 
+current directory.
+
+### Returns:
+The absolute path to the newly set MDCD home as a string.
+
+### Examples:
+  (mdcd-use-default-home)
+  ;"/Users/masukomi/workspace/mdcd/docs/"

@@ -1,4 +1,4 @@
-## Public: show-params
+## [procedure] (show-params name)
 Displays the "Parameters" documentation for the specified name
 
 ### Parameters:

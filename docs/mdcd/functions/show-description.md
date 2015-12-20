@@ -1,4 +1,4 @@
-## Public: show-description
+## [procedure] (show-description name)
 Displays the description documentation for the specified name
 
 ### Parameters:

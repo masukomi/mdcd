@@ -1,4 +1,4 @@
-## Public: show-doc
+## [procedure] (show-doc name)
 Sends the documentation for the specified name to standard out
 via the `display` function. Typically only used in the REPL.
 

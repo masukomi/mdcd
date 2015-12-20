@@ -1,4 +1,4 @@
-## Public: show-notes
+## [procedure] (show-notes name)
 Displays "Returns" documentation of the specified name
 
 ### Parameters:

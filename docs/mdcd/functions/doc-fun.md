@@ -1,4 +1,4 @@
-## Public: doc-fun name doc-string [module-name]
+## [procedure] (doc-fun name doc-string [module-name])
 Generates documentation for a function.
 
 ### Parameters:

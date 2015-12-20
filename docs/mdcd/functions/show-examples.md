@@ -1,4 +1,4 @@
-## Public: show-examples
+## [procedure] (show-examples name)
 Displays "Examples" documentation of the specified name
 
 ### Parameters:

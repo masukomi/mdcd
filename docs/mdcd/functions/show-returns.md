@@ -1,4 +1,4 @@
-## Public: show-returns
+## [procedure] (show-returns name)
 Displays "Returns" documentation of the specified name
 
 ### Parameters:

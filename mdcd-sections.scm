@@ -1,23 +1,21 @@
 (module mdcd-sections
   (
 
+   extract-section
+   ; WARNING:
    ; THE FOLLOWING WERE ONLY EXPORTED 
    ; TO FACILITATE TDD
-   ; THEY CAN ALL BE COMMENTED OUT
+   ; THEY WILL PROBABLY ALL BE COMMENTED OUT
+   ; DO NOT RELY ON THEM
    header-line-truthyness
    header-indexes
-   extract-section
    section-line-numbers
    section-start
    line-matches-section?
    string-is-md-header?
    )
-  (import chicken)
-  (import scheme)
-  (use data-structures)
-  (use srfi-13)
-  (use srfi-1)
-  (use listicles)
+  (import chicken scheme)
+  (use data-structures srfi-13 srfi-1 listicles)
   (require-extension regex)
 
   (define (header-indexes lines)

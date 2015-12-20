@@ -10,11 +10,8 @@
     mdcd-default-home-dirs  ; but maybe someone else will find 
                             ; a use for them
    )
-  (import chicken)
-  (import scheme)
-  (use files)
-  (use data-structures)
-  (use posix)
+  (import chicken scheme)
+  (use files data-structures posix)
 
 
 
@@ -24,7 +21,11 @@
   ; their systems
   (define *mdcd-home* '())
 
-  ; ## Public: set-mcdc-home
+  ; NOTE THE FOLLOWING ARE NOT COMMENTED WITH MDCD
+  ; because it hasn't been loaded yet. :/
+  
+
+  ; ## [procedure] set-mcdc-home
   ; Sets the directory where MCDC files are stored
   ; 
   ; ### Parameters:
@@ -38,14 +39,18 @@
     (set! *mdcd-home* directory-list)
     (get-mdcd-home))
 
-  ; ## Public: get-mdcd-home
+  ; ## [procedure] get-mdcd-home
   ; Returns the path to the directory where MDCD files will be stored.
-  ; 
+  ;
   ; ### Returns:
   ; The path to the directory where MDCD files will be stored.
-  ; 
-  ; ### Note:
+  ;
+  ; ### Notes:
   ; Defaults to "<current directory>/docs"
+  ;
+  ; ### Examples:
+  ;
+  ;     (get-mdcd-home)
   (define (get-mdcd-home)
     (make-absolute-pathname *mdcd-home* ""))
 
@@ -58,7 +63,7 @@
   (define (mdcd-disable)
     (set-mdcd-home '())
     #t)
-  
+
   (define (mdcd-default-home-dirs)
     (append (string-split (current-directory) "/") '("docs")))
 

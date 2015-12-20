@@ -1,4 +1,4 @@
-## Public: doc-syntax mini-syntax-identifier doc-string [module-name]
+## [procedure] (doc-syntax mini-syntax-identifier doc-string [module-name])
 Generates documentation for a syntax change.
 
 ### Parameters:

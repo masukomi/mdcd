@@ -71,7 +71,7 @@
       (write-doc mdcd-path-for-fun name doc-string module-name)))
   ; We now have enough code to start eating our own dog food.
   ; YAY.
-  (doc-fun "doc-fun" "## Public: (doc-fun name doc-string [module-name])
+  (doc-fun "doc-fun" "## [procedure] (doc-fun name doc-string [module-name])
 Generates documentation for a function.
 
 ### Parameters:
@@ -84,7 +84,7 @@ Returns the path to the newly written file" "mdcd")
 
 
   (doc-fun "doc-syntax" 
-"## Public: (doc-syntax mini-syntax-identifier doc-string [module-name])
+"## [procedure] (doc-syntax mini-syntax-identifier doc-string [module-name])
 Generates documentation for a syntax change.
 
 ### Parameters:
@@ -109,7 +109,7 @@ referencable (like a method name) as possible." "mdcd")
       doc-string 
       module-name))
 
-  (doc-fun "doc-var" "## Public: (doc-var name doc-string [module-name])
+  (doc-fun "doc-var" "## [procedure] (doc-var name doc-string [module-name])
 Generates documentation for a variable.
 Typically you would only use this for a variable of atypical significance
 that others should be made aware of 
@@ -125,7 +125,7 @@ The path to the file where the docs were written." "mdcd")
   (define (doc-var name doc-string #!optional (module-name ""))
     (write-doc mdcd-path-for-var name doc-string module-name))
 
-  (doc-fun "show-doc" "## Public: (show-doc name)
+  (doc-fun "show-doc" "## [procedure] (show-doc name)
 Sends the documentation for the specified name to standard out
 via the `display` function. Typically only used in the REPL.
 
@@ -146,7 +146,7 @@ via the `display` function. Typically only used in the REPL.
         (display "Undocumented"));<-- can't happen
     ))
 
-  (doc-fun "show-description" "## Public: (show-description name)
+  (doc-fun "show-description" "## [procedure] (show-description name)
 Displays the description documentation for the specified name
 
 ### Parameters:
@@ -164,7 +164,7 @@ Typically this is the `## Public: function-name ...` block.
   (define (show-description name)
     (show-section name 'description))
 
-  (doc-fun "show-params" "## Public: (show-params name)
+  (doc-fun "show-params" "## [procedure] (show-params name)
 Displays the \"Parameters\" documentation for the specified name
 
 ### Parameters:
@@ -181,7 +181,7 @@ The contents of the `### Parameters:...` block (if present).
   (define (show-params name)
     (show-section name 'parameters))
 
-  (doc-fun "show-returns" "## Public: (show-returns name)
+  (doc-fun "show-returns" "## [procedure] (show-returns name)
 Displays \"Returns\" documentation of the specified name
 
 ### Parameters:
@@ -197,7 +197,7 @@ The contents of the `### Returns:...` block (if present).
 " "mdcd")
   (define (show-returns name)
     (show-section name 'returns))
-  (doc-fun "show-examples" "## Public: (show-examples name)
+  (doc-fun "show-examples" "## [procedure] (show-examples name)
 Displays \"Examples\" documentation of the specified name
 
 ### Parameters:
@@ -213,7 +213,7 @@ The contents of the `### Examples:...` block (if present).
 " "mdcd")
   (define (show-examples name)
     (show-section name 'examples))
-  (doc-fun "show-notes" "## Public: (show-notes name)
+  (doc-fun "show-notes" "## [procedure] (show-notes name)
 Displays \"Returns\" documentation of the specified name
 
 ### Parameters:
@@ -230,7 +230,7 @@ The contents of the `### Notes:...` block (if present).
 
   (define (show-notes name)
     (show-section name 'notes))
-  (doc-fun "show-section" "## Public: (show-section name section)
+  (doc-fun "show-section" "## [procedure] (show-section name section)
 Displays \"Returns\" documentation of the specified name
 
 ### Parameters:
@@ -264,7 +264,7 @@ If you wanted to do the same for a custom section you would:
       )
     )
 
-  (doc-fun "read-doc" "## Public: (read-doc name)
+  (doc-fun "read-doc" "## [procedure] (read-doc name)
 Returns the documentation for the specified name as a string.
 Searches for the specified name under functions, vars, and finally
 syntax. Returs the first one that is encountered.
@@ -385,7 +385,7 @@ The complete documentation for the specified item as a string
   ;; method wasn't loaded yet, and putting them in the middle of the 
   ;; doc would have been even weirder than putting them at the bottom.
   (doc-fun "mdcd-path-for-var"
-"## Public: (mdcd-path-for-var name [module-name])
+"## [procedure] (mdcd-path-for-var name [module-name])
 Calculates the path where the documentation for the specified variable will/does live.
 
 ### Parameters:
@@ -404,7 +404,7 @@ A string representation of the absolute path to the file.
 " "mdcd")
 
   (doc-fun "mdcd-path-for-fun"
-"## Public: (mdcd-path-for-fun name [module-name])
+"## [procedure] (mdcd-path-for-fun name [module-name])
 Calculates the path where the documentation for the specified function will/does live.
 
 ### Parameters:
@@ -423,7 +423,7 @@ A string representation of the absolute path to the file.
 " "mdcd")
 
   (doc-fun "mdcd-path-for-syntax"
-"## Public: (mdcd-path-for-fun mini-syntax-identifier [module-name])
+"## [procedure] (mdcd-path-for-fun mini-syntax-identifier [module-name])
 Calculates the path where the documentation for the specified syntax will/does live.
 
 ### Parameters:

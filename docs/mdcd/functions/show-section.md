@@ -1,4 +1,4 @@
-## Public: show-section
+## [procedure] (show-section name section)
 Displays "Returns" documentation of the specified name
 
 ### Parameters:

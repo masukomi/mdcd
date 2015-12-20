@@ -1,4 +1,4 @@
-## Public: read-doc
+## [procedure] (read-doc name)
 Returns the documentation for the specified name as a string.
 Searches for the specified name under functions, vars, and finally
 syntax. Returs the first one that is encountered.
