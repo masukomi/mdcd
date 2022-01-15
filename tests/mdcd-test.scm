@@ -1,14 +1,14 @@
 ;#!/usr/local/bin/csi
 
 ; (require-extension test)
-(use test); ^^ same effect
+(import test); ^^ same effect
 (import mdcd-config)
 (import mdcd)
-(use files)
-(use directory-utils)
-(use srfi-13)
-(use filepath)
-(use ports)
+(import files)
+(import directory-utils)
+(import srfi-13)
+(import filepath)
+(import ports)
 
 (define (remove-file file-path)
   (if (file-exists? file-path)

@@ -2,11 +2,11 @@
 Displays "Returns" documentation of the specified name
 
 ### Parameters:
-* name - the name of the method/variable/syntax you want 
+* name - the name of the method/variable/syntax you want
   documentation for.
 * section - a symbol that matches the name of the section
-  you want information on. The symbol must match the name of 
-  the section (case insensitive). E.g. `'paramaters` would be 
+  you want information on. The symbol must match the name of
+  the section (case insensitive). E.g. `'paramaters` would be
   specified to match the `### Parameters:` section.
 
 ### Returns:

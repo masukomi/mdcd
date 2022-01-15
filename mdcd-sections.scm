@@ -12,13 +12,13 @@
    line-matches-section?
    string-is-md-header?
    )
-  (import chicken)
+  (import chicken.base)
+  (import chicken.string)
   (import scheme)
-  (use data-structures)
-  (use srfi-13)
-  (use srfi-1)
-  (use listicles)
-  (require-extension regex)
+  (import srfi-13)
+  (import srfi-1)
+  (import listicles)
+  (import regex)
 
   (define (header-indexes lines)
     (let ((line-headerness-pairs (header-line-truthyness lines)))

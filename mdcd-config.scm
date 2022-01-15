@@ -10,11 +10,13 @@
     mdcd-default-home-dirs  ; but maybe someone else will find 
                             ; a use for them
    )
-  (import chicken)
+  (import chicken.base)
+  (import chicken.file)
+  (import chicken.file.posix)
+  (import chicken.pathname)
+  (import chicken.process-context)
+  (import chicken.string)
   (import scheme)
-  (use files)
-  (use data-structures)
-  (use posix)
 
 
 

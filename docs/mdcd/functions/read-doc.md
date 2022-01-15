@@ -4,7 +4,7 @@ Searches for the specified name under functions, vars, and finally
 syntax. Returs the first one that is encountered.
 
 ### Parameters:
-* name - the name of the function/variable/syntax you want 
+* name - the name of the function/variable/syntax you want
   documentation for.
 
 ### Returns:

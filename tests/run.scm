@@ -1,6 +1,6 @@
-(use mdcd-config)
-(use mdcd-sections)
-(use mdcd)
+(import mdcd-config)
+(import mdcd-sections)
+(import mdcd)
 
 (load "mdcd-config-test.scm")
 (load "mdcd-sections-test.scm")

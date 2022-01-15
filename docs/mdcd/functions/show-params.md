@@ -2,7 +2,7 @@
 Displays the "Parameters" documentation for the specified name
 
 ### Parameters:
-* name - the name of the method/variable/syntax you want 
+* name - the name of the method/variable/syntax you want
   documentation for.
 
 ### Returns:

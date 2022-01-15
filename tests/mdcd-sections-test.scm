@@ -1,7 +1,7 @@
 ;#!/usr/local/bin/csi
 
 ; (require-extension test)
-(use test); ^^ same effect
+(import test); ^^ same effect
 (import (prefix mdcd-sections ms:))
 
 (let (

@@ -1,8 +1,8 @@
 ;#!/usr/local/bin/csi
 
 ; (require-extension test)
-(use test); ^^ same effect
-;(use files)
+(import test); ^^ same effect
+;(import files)
 (import mdcd-config)
 (import mdcd)
 

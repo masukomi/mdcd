@@ -1,8 +1,8 @@
 ; # MCDC Mardown Code DoCs
 ; Allows you to markup your code with Markdown.
-; Enables you to: 
+; Enables you to:
 ; * request docs for any documented function in a REPL
-; * generate markdown files for easy searchability 
+; * generate markdown files for easy searchability
 ;   via tools like spotlight
 ; * generate static html for distributing your documentation
 ;
@@ -29,34 +29,37 @@
     show-notes
     show-section
 
-    
-    ; the following are only exported for 
+
+    ; the following are only exported for
     ; testing purposes. please delete before creating eggs.
     mdcd-path-for-var
     mdcd-path-for-fun
     mdcd-path-for-syntax
 
     mdcd-name-cleaner
-    
-   )
-  (import chicken)
+
+    )
   (import scheme)
-  (use files)
-  (use directory-utils)
-  (use data-structures)
-  (use utils); for read-all procedure
-  (require-extension regex)
-  (use srfi-13)
-  (use extras)
-  (use listicles)
-  ;(import srfi-1)
+  (import chicken.base)
+  (import chicken.file)
+  (import chicken.file.posix)
+  (import chicken.format)
+  (import chicken.io) ; for read-string
+  (import chicken.port)
+  (import chicken.pathname)
+  (import chicken.string)
+;;;;  ;; (import data-structures) ; can NOT manage to install this anymore
+  (import directory-utils) ; can NOT manage to install this anymore
+  (import regex)
+  (import srfi-13)
+  (import listicles)
+  (import masufiles) ; for file->string
   (import mdcd-config)
   (import (prefix mdcd-sections ms:))
-  (import posix)
 
-  ;(use symbol-utils); for unbound?
+;;;  ;(import symbol-utils); for unbound?
 
-  
+
 
   ; ## Private: mdcd-name-cleaner
   ; converts method and variable names into something more filesystem friendly
@@ -74,7 +77,8 @@
     (string-concatenate (list (mdcd-name-cleaner name) ".md")))
 
   (define (mdcd-file-for identifier subfolder #!optional (module-name '()))
-    (make-absolute-pathname 
+    (format "XXX identifier: ~A subfolder: ~A module-name: ~A " identifier subfolder module-name )
+    (make-absolute-pathname
       (list (get-mdcd-home) module-name subfolder)
       (mdcd-name-cleaner identifier)
       "md"))
@@ -91,7 +95,7 @@
   (define (mdcd-write-doc doc-string file-path)
     (if (mdcd-enabled?)
       (begin
-       (if (not (directory-exists? (pathname? file-path)))
+       (if (not (directory-exists? file-path))
         (create-pathname-directory file-path))
        (with-output-to-file file-path
         (lambda ()
@@ -116,7 +120,7 @@
   (define (mdcd-path-for-syntax name #!optional (module-name ""))
     (mdcd-file-for name "syntax" module-name))
 
-  
+
   ; see below for documentation
   (define (doc-fun name doc-string #!optional (module-name ""))
     (if (mdcd-enabled?)
@@ -135,7 +139,7 @@ Generates documentation for a function.
 Returns the path to the newly written file" "mdcd")
 
 
-  (doc-fun "doc-syntax" 
+  (doc-fun "doc-syntax"
 "## Public: doc-syntax mini-syntax-identifier doc-string [module-name]
 Generates documentation for a syntax change.
 
@@ -150,21 +154,21 @@ The path to the file where the docs were written.
 ### Notes:
 Picking a good `mini-syntax-identifier` is tricky because syntax changes
 typically don't have some standard symbol you can point to.
-If, for example you were to add Ruby style array initialization 
-syntax (e.g. [\"a\", \"b\"] ) you might choose `[...]` as your 
+If, for example you were to add Ruby style array initialization
+syntax (e.g. [\"a\", \"b\"] ) you might choose `[...]` as your
 `mini-syntax-identifier`. Just make an attempt to come as close to something
 referencable (like a method name) as possible." "mdcd")
   (define (doc-syntax mini-syntax-identifier doc-string #!optional (module-name ""))
-    (write-doc 
-      mdcd-path-for-syntax 
-      mini-syntax-identifier 
-      doc-string 
+    (write-doc
+      mdcd-path-for-syntax
+      mini-syntax-identifier
+      doc-string
       module-name))
 
   (doc-fun "doc-var" "## Public: doc-var name doc-string [module-name]
 Generates documentation for a variable.
 Typically you would only use this for a variable of atypical significance
-that others should be made aware of 
+that others should be made aware of
 
 ### Parameters:
 * name - a symbol representing the name of the variable
@@ -182,7 +186,7 @@ Sends the documentation for the specified name to standard out
 via the `display` function. Typically only used in the REPL.
 
 ### Parameters:
-* name - the name of the method/variable/syntax you want 
+* name - the name of the method/variable/syntax you want
   documentation for.
 
 ### Returns:
@@ -202,7 +206,7 @@ via the `display` function. Typically only used in the REPL.
 Displays the description documentation for the specified name
 
 ### Parameters:
-* name - the name of the method/variable/syntax you want 
+* name - the name of the method/variable/syntax you want
   documentation for.
 
 ### Returns:
@@ -220,7 +224,7 @@ Typically this is the `## Public: function-name ...` block.
 Displays the \"Parameters\" documentation for the specified name
 
 ### Parameters:
-* name - the name of the method/variable/syntax you want 
+* name - the name of the method/variable/syntax you want
   documentation for.
 
 ### Returns:
@@ -237,7 +241,7 @@ The contents of the `### Parameters:...` block (if present).
 Displays \"Returns\" documentation of the specified name
 
 ### Parameters:
-* name - the name of the method/variable/syntax you want 
+* name - the name of the method/variable/syntax you want
   documentation for.
 
 ### Returns:
@@ -249,11 +253,13 @@ The contents of the `### Returns:...` block (if present).
 " "mdcd")
   (define (show-returns name)
     (show-section name 'returns))
+
+
   (doc-fun "show-examples" "## Public: show-examples
 Displays \"Examples\" documentation of the specified name
 
 ### Parameters:
-* name - the name of the method/variable/syntax you want 
+* name - the name of the method/variable/syntax you want
   documentation for.
 
 ### Returns:
@@ -265,11 +271,13 @@ The contents of the `### Examples:...` block (if present).
 " "mdcd")
   (define (show-examples name)
     (show-section name 'examples))
+
+
   (doc-fun "show-notes" "## Public: show-notes
 Displays \"Returns\" documentation of the specified name
 
 ### Parameters:
-* name - the name of the method/variable/syntax you want 
+* name - the name of the method/variable/syntax you want
   documentation for.
 
 ### Returns:
@@ -282,15 +290,16 @@ The contents of the `### Notes:...` block (if present).
 
   (define (show-notes name)
     (show-section name 'notes))
+
   (doc-fun "show-section" "## Public: show-section
 Displays \"Returns\" documentation of the specified name
 
 ### Parameters:
-* name - the name of the method/variable/syntax you want 
+* name - the name of the method/variable/syntax you want
   documentation for.
 * section - a symbol that matches the name of the section
-  you want information on. The symbol must match the name of 
-  the section (case insensitive). E.g. `'paramaters` would be 
+  you want information on. The symbol must match the name of
+  the section (case insensitive). E.g. `'paramaters` would be
   specified to match the `### Parameters:` section.
 
 ### Returns:
@@ -330,14 +339,14 @@ If you wanted to do the same for a custom section you would:
           (if (eq? 1 (length docs))
             (car docs)
             (begin
-              (write-line (sprintf 
-                            "there were ~A docs matching that name" 
+              (write-line (sprintf
+                            "there were ~A docs matching that name"
                             (length docs)))
               (let ((idx -1))
-                (for-each (lambda(x) 
-                            (begin 
+                (for-each (lambda(x)
+                            (begin
                               (set! idx (+ idx 1))
-                              (print (sprintf "~A) ~A" idx 
+                              (print (sprintf "~A) ~A" idx
                                      (car (string-split x "\n" #t))
                                      ))))
                   docs))
@@ -349,7 +358,7 @@ Searches for the specified name under functions, vars, and finally
 syntax. Returs the first one that is encountered.
 
 ### Parameters:
-* name - the name of the function/variable/syntax you want 
+* name - the name of the function/variable/syntax you want
   documentation for.
 
 ### Returns:
@@ -363,7 +372,7 @@ The complete documentation for the specified item as a string
        (let ((paths (find-paths-with-name name)))
         (if (eq? 0 (length paths))
           '("Undefined")
-          (map (lambda(x)(read-all x)) paths))
+          (map (lambda(x)(file->string x)) paths))
           ;TODO modify both ^^^ cases to return lists
        )
       '("MDCD: Disabled")))
@@ -374,10 +383,12 @@ The complete documentation for the specified item as a string
           (if (> (length docs) 0)
             (choose-doc docs)
             (car docs))))
-    
+
     (define (find-paths-with-name name)
       (find-files (get-mdcd-home)
           test: (lambda(filepath)
             (equal? name (car (reverse (string-split filepath "/")))))))
+
+
 
 ); END module mdcd

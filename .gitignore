@@ -1,3 +1,5 @@
-salmonella.log
-*.so
+*.o
+*.link
 *.import.scm
+*.tgz
+salmonella.log
