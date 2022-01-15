@@ -4,11 +4,11 @@
 (import test); ^^ same effect
 (import mdcd-config)
 (import mdcd)
-(import files)
+(import chicken.file)
 (import directory-utils)
 (import srfi-13)
 (import filepath)
-(import ports)
+(import chicken.port)
 
 (define (remove-file file-path)
   (if (file-exists? file-path)
