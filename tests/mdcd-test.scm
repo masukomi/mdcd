@@ -9,26 +9,13 @@
 (import srfi-13)
 (import filepath)
 (import chicken.port)
+(import shell)
 
-(define (remove-file file-path)
-  (if (file-exists? file-path)
-    (system (sprintf "rm ~A" file-path))
-  )
-)
 
-(define (get-doc-section section-method docfun-fun-path test-doc-string)
-  (remove-file docfun-fun-path)
-  (doc-fun "test-mdcd-docfun" test-doc-string)
-  (let ((response-string 
-          (with-output-to-string
-                  (lambda()(section-method "test-mdcd-docfun"))))
-                  )
-    (remove-file docfun-fun-path)
-    response-string)
+(import chicken.format)
 
-  )
 
-(let ((temp-home (append 
+(let ((temp-home (append
            '("/")
            (string-split (create-temporary-directory) "/")
            '("docs"))))
@@ -41,7 +28,7 @@
 "## Private: test-mdcd-docfun
 Totally not a real method
 
-## Returns: 
+## Returns:
 `#f` because it's bogus
 
 ## Examples:
@@ -51,173 +38,148 @@ Hah!")
           (docfun-syntax-path (mdcd-path-for-syntax "test-mdcd-docfun" ))
   )
       (test-group "MDCD"
-      (test-group "file paths"
-          (test-group "directories"
-          ; they functions, variables, and syntax things should
-          ; all be stored in different places
-          (let ((manual-fun-path (string-concatenate (list
-                            (get-mdcd-home) ; ends with a /
-                            "functions/test-mdcd-docfun.md")))
-                  (manual-var-path (string-concatenate (list
-                            (get-mdcd-home) ; ends with a /
-                            "variables/test-mdcd-docfun.md")))
-                  (manual-syntax-path (string-concatenate (list
-                            (get-mdcd-home) ; ends with a /
-                            "syntax/test-mdcd-docfun.md"))))
-              (test "functions stored in correct dir"
-                  manual-fun-path docfun-fun-path)
-              (test "variable stored in correct dir"
-                  manual-var-path docfun-var-path)
-              (test "syntax stored in correct dir"
-                  manual-syntax-path docfun-syntax-path)
-          )
-          )
-      (test-group "subdirectories"
-      (let ((manual-fun-path (string-concatenate (list
-                            (get-mdcd-home) ; ends with a /
-                            "my-module/functions/test-mdcd-docfun.md")))
-                  (manual-var-path (string-concatenate (list
-                            (get-mdcd-home) ; ends with a /
-                            "my-module/variables/test-mdcd-docfun.md")))
-                  (manual-syntax-path (string-concatenate (list
-                            (get-mdcd-home) ; ends with a /
-                            "my-module/syntax/test-mdcd-docfun.md"))))
-              (test "functions stored in correct dir"
-                  manual-fun-path
-                  (mdcd-path-for-fun "test-mdcd-docfun" "my-module"))
-              (test "variable stored in correct dir"
-                  manual-var-path
-                  (mdcd-path-for-var "test-mdcd-docfun" "my-module"))
-              (test "syntax stored in correct dir"
-                  manual-syntax-path
-                  (mdcd-path-for-syntax "test-mdcd-docfun" "my-module"))
-          )
-      )
-          (test-group "naming"
-          ; doesn't do space removal because you can't name
-          ; anything with a space in scheme
-          (test "function names converted to safe file names"
-                  "a-b_c_d_e_f_g_h_i_j_k_l_m_n_o_p_q_r_s"
-                  ;^^^ note the hyhpen stays a hyphen
-                  (filepath:take-base-name
-                  (mdcd-path-for-fun "a-b$c%d&e*f+g!h.i/j:k<l=m>n?o@p^q~r s" )))
-          )
-      )
-      ; (test-group "file names"
-      ; )
-      (test-group "creation"
-          (test-group "disabled"
-          ; nothing should be created when disabled
-              (mdcd-disable)
-              (remove-file docfun-fun-path)
-              (doc-fun "test-mdcd-docfun" test-doc-string)
-              (test-assert "documenting a function DOESN'T create a file"
-                            (not (file-exists? docfun-fun-path)))
-              (remove-file docfun-var-path)
-              (doc-var "test-mdcd-docfun" test-doc-string)
-              (test-assert "documenting a variable DOESN'T create a file"
-                            (not (file-exists? docfun-var-path)))
-              (remove-file docfun-syntax-path)
-              (doc-syntax "test-mdcd-docfun" test-doc-string)
-              (test-assert "documenting a variable DOESN'T create a file"
-                            (not (file-exists? docfun-syntax-path)))
-          )
-          (test-group "enabled"
-          (set-mdcd-home temp-home)
-          (test-group "sanity check"
-              (test-assert (mdcd-enabled?))
-              (test "function file path"
-                  docfun-fun-path
-                  (mdcd-path-for-fun "test-mdcd-docfun" )
-                      ))
-          (test-group "functions"
-              ; doc-fun should create a file
-              ; so, first delete it.
-              (remove-file docfun-fun-path)
-              (doc-fun "test-mdcd-docfun" test-doc-string)
-              (test-assert "documenting a function creates a file"
-                            (file-exists? docfun-fun-path))
+        ;; (test-group "file paths"
+        ;;     (test-group "directories"
+        ;;     ; they functions, variables, and syntax things should
+        ;;     ; all be stored in different places
+        ;;     (let ((manual-fun-path (string-concatenate (list
+        ;;                       (get-mdcd-home) ; ends with a /
+        ;;                       "functions/test-mdcd-docfun.md")))
+        ;;             (manual-var-path (string-concatenate (list
+        ;;                       (get-mdcd-home) ; ends with a /
+        ;;                       "variables/test-mdcd-docfun.md")))
+        ;;             (manual-syntax-path (string-concatenate (list
+        ;;                       (get-mdcd-home) ; ends with a /
+        ;;                       "syntax/test-mdcd-docfun.md"))))
+        ;;         (test "functions stored in correct dir"
+        ;;             manual-fun-path docfun-fun-path)
+        ;;         (test "variable stored in correct dir"
+        ;;             manual-var-path docfun-var-path)
+        ;;         (test "syntax stored in correct dir"
+        ;;             manual-syntax-path docfun-syntax-path)
+        ;;     )
+        ;; )
+        ;; (test-group "subdirectories"
+        ;;   (let ((manual-fun-path (string-concatenate (list
+        ;;                         (get-mdcd-home) ; ends with a /
+        ;;                         "my-module/functions/test-mdcd-docfun.md")))
+        ;;               (manual-var-path (string-concatenate (list
+        ;;                         (get-mdcd-home) ; ends with a /
+        ;;                         "my-module/variables/test-mdcd-docfun.md")))
+        ;;               (manual-syntax-path (string-concatenate (list
+        ;;                         (get-mdcd-home) ; ends with a /
+        ;;                         "my-module/syntax/test-mdcd-docfun.md"))))
+        ;;           (test "functions stored in correct dir"
+        ;;               manual-fun-path
+        ;;               (mdcd-path-for-fun "test-mdcd-docfun" "my-module"))
+        ;;           (test "variable stored in correct dir"
+        ;;               manual-var-path
+        ;;               (mdcd-path-for-var "test-mdcd-docfun" "my-module"))
+        ;;           (test "syntax stored in correct dir"
+        ;;               manual-syntax-path
+        ;;               (mdcd-path-for-syntax "test-mdcd-docfun" "my-module"))
+        ;;       ))
+        ;; (test-group "naming"
+        ;;     ; doesn't do space removal because you can't name
+        ;;     ; anything with a space in scheme
+        ;;     (test "function names converted to safe file names"
+        ;;             "a-b_c_d_e_f_g_h_i_j_k_l_m_n_o_p_q_r_s"
+        ;;             ;^^^ note the hyhpen stays a hyphen
+        ;;             (filepath:take-base-name
+        ;;             (mdcd-path-for-fun "a-b$c%d&e*f+g!h.i/j:k<l=m>n?o@p^q~r s" )))
+        ;;     )
+        ;; )
+        ;; (test-group "creation"
+        ;;     (test-group "disabled"
+        ;;     ; nothing should be created when disabled
+        ;;         (mdcd-disable-write)
+        ;;         (remove-file docfun-fun-path)
+        ;;         (doc-fun "test-mdcd-docfun" test-doc-string)
+        ;;         (test-assert "documenting a function DOESN'T create a file"
+        ;;                       (not (file-exists? docfun-fun-path)))
+        ;;         (remove-file docfun-var-path)
+        ;;         (doc-var "test-mdcd-docfun" test-doc-string)
+        ;;         (test-assert "documenting a variable DOESN'T create a file"
+        ;;                       (not (file-exists? docfun-var-path)))
+        ;;         (remove-file docfun-syntax-path)
+        ;;         (doc-syntax "test-mdcd-docfun" test-doc-string)
+        ;;         (test-assert "documenting a variable DOESN'T create a file"
+        ;;                       (not (file-exists? docfun-syntax-path)))
+        ;;     )
+        ;;     (test-group "enabled"
+        ;;       (mdcd-enable-write)
+        ;;       (test-group "sanity check"
+        ;;           (test-assert (mdcd-write-enabled?))
+        ;;           (test "function file path"
+        ;;               docfun-fun-path
+        ;;               (mdcd-path-for-fun "test-mdcd-docfun" )
+        ;;                   ))
+        ;;       (test-group "functions"
+        ;;           ; doc-fun should create a file
+        ;;           ; so, first delete it.
+        ;;           (remove-file docfun-fun-path)
+        ;;           (doc-fun "test-mdcd-docfun" test-doc-string)
+        ;;           (test-assert "documenting a function creates a file"
+        ;;                         (file-exists? docfun-fun-path))
 
-              (remove-file docfun-fun-path) ; cleanup
-          )
-          (test-group "variables"
-              (remove-file docfun-var-path)
-              (doc-var "test-mdcd-docfun" test-doc-string)
-              (test-assert "documenting a variable creates a file"
-                            (file-exists? docfun-var-path))
-              (remove-file docfun-var-path) ; cleanup
+        ;;           (remove-file docfun-fun-path) ; cleanup
+        ;;       )
+        ;;       (test-group "variables"
+        ;;             (remove-file docfun-var-path)
+        ;;             (doc-var "test-mdcd-docfun" test-doc-string)
+        ;;             (test-assert "documenting a variable creates a file"
+        ;;                           (file-exists? docfun-var-path))
+        ;;             (remove-file docfun-var-path) ; cleanup
 
-          )
-          (test-group "syntax"
-              (remove-file docfun-syntax-path)
-              (doc-syntax "test-mdcd-docfun" test-doc-string)
-              (test-assert "documenting syntax creates a file"
-                            (file-exists? docfun-syntax-path))
-              (remove-file docfun-syntax-path) ; cleanup
-          )
-          (mdcd-disable)
-          )
-      )
+        ;;         )
+        ;;       (test-group "syntax"
+        ;;           (remove-file docfun-syntax-path)
+        ;;           (doc-syntax "test-mdcd-docfun" test-doc-string)
+        ;;           (test-assert "documenting syntax creates a file"
+        ;;                         (file-exists? docfun-syntax-path))
+        ;;           (remove-file docfun-syntax-path) ; cleanup
+        ;;       )
+        ;;       (mdcd-disable-write)
+        ;;     )
+        ;; )
       (test-group "retrieval"
-          (set-mdcd-home temp-home)
+          (mdcd-disable-write)
+          (doc-fun "test-mdcd-docfun" test-doc-string "test")
           (test-group "show-doc"
-          (let ((test-doc-plus-newline (conc test-doc-string #\newline)))
               (test "can display entire doc"
-                  test-doc-plus-newline
-                  (get-doc-section show-doc docfun-fun-path test-doc-string)))
+                  test-doc-string
+                  (show-doc "test-mdcd-docfun"))
           )
 
           (test-group "show-description"
-              (test "can display description alone"
+            (test "can display description alone"
 "## Private: test-mdcd-docfun
 Totally not a real method
-
 "
-                  (get-doc-section show-description docfun-fun-path test-doc-string))
+
+              (show-description "test-mdcd-docfun"))
           )
           (test-group "show-returns"
-              (test "can display returns alone"
-"## Returns: 
+            (test "can display returns alone"
+"## Returns:
 `#f` because it's bogus
-
 "
-                  (get-doc-section show-returns docfun-fun-path test-doc-string))
+                  (show-returns "test-mdcd-docfun"))
           )
           (test-group "show-examples"
-              (test "can display examples alone"
+            (test "can display examples alone"
 "## Examples:
-Hah!
-
-"
-                  (get-doc-section show-examples docfun-fun-path test-doc-string))
+Hah!"
+                  (show-examples "test-mdcd-docfun"))
           )
-          (test-group "read-doc"
-            (test-group "multi-file"
-              (remove-file docfun-fun-path)
-                (doc-fun "test-mdcd-docfun" test-doc-string)
-                (test-assert (file-exists? docfun-fun-path))
-        (let ((docfun-foo-fun-path
-            (mdcd-path-for-fun "test-mdcd-docfun" "foo" )))
-                  (doc-fun "test-mdcd-docfun" test-doc-string "foo")
-                  ; now there should be two of them
-                  (test-assert (file-exists? docfun-foo-fun-path))
-                  (test "two files with same name returns two files"
-                    2
-                    (length (read-doc
-                          "test-mdcd-docfun.md")))
-                  (remove-file docfun-foo-fun-path)
-                  ))
-            (test-group "disabled"
-        (mdcd-disable)
-            (test "disabled when home is null"
-                      '("MDCD: Disabled")
-                      (read-doc "test-mdcd-docfun" ))))
 
-          (mdcd-disable)
-      )
+          (mdcd-forget "test" "functions" "test-mdcd-docfun")
+
+
+      ) ;END retrieval
 
       )
-      (delete-directory temp-home-path #t)
+      ;(delete-directory temp-home-path #t)
   )
 
 )

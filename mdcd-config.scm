@@ -2,9 +2,10 @@
   (
     set-mdcd-home
     get-mdcd-home
-    mdcd-enabled?
-    mdcd-disable
-    mdcd-use-default-home
+    mdcd-disable-write
+    mdcd-enable-write
+    mdcd-write-enabled?
+    mdcd-write-with-defaults
 
     get-mdcd-home-dirs      ; mostly to facilitate testing 
     mdcd-default-home-dirs  ; but maybe someone else will find 
@@ -19,12 +20,14 @@
   (import scheme)
 
 
-
   ; we want it to NOT write files by default
   ; because you don't want users of your code
   ; suddenly having your docs spewed into
   ; their systems
   (define *mdcd-home* '())
+
+  (define *mdcd-write* #f)
+
 
   ; ## Public: set-mcdc-home
   ; Sets the directory where MCDC files are stored
@@ -54,17 +57,22 @@
   (define (get-mdcd-home-dirs)
     *mdcd-home*)
 
-  (define (mdcd-enabled?)
-    (not (equal? '() *mdcd-home*)))
+  (define (mdcd-write-enabled?)
+    *mdcd-write*)
 
-  (define (mdcd-disable)
-    (set-mdcd-home '())
+  (define (mdcd-disable-write)
+    (set! *mdcd-write* #f)
+    #t)
+
+  (define (mdcd-enable-write)
+    (set! *mdcd-write* #t)
     #t)
   
   (define (mdcd-default-home-dirs)
     (append (string-split (current-directory) "/") '("docs")))
 
-  (define (mdcd-use-default-home)
+  (define (mdcd-write-with-defaults)
+    (mdcd-enable-write)
     (set-mdcd-home (mdcd-default-home-dirs)))
 
 )

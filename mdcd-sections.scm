@@ -53,14 +53,13 @@
 ; The extracted section of the docs.")
   (define (extract-section section doc-string)
     (let ((lines  (string-split doc-string "\n" #t)))
+      ; TODO: OMFG inefficient
+      ; there's gotta be a way to slice
        (map (lambda(x)(nth x lines))
           (section-line-numbers
              (header-indexes lines)
              section
-             lines)
-          )
-    )
-  )
+             lines))))
   
   (define (section-start header-indexes section)
     (if (eq? section 'description)

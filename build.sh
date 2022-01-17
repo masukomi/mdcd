@@ -25,9 +25,7 @@ if [ "$1" != "" ]; then
 fi
 
 echo "Removing previous builds"
-rm -f *.link
-rm -f *.import.scm
-rm -f *.o
+rm *{.import.scm,.import.so,.link,.o,.so}
 
 echo "Building libraries"
 # note: the ordering here is intentional

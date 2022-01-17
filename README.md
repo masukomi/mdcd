@@ -36,7 +36,7 @@ course).
 ```scheme
 	(import mdcd-config) 
 	; ^^^ must be loaded before mdcd itself.
-	(mdcd-use-default-home) 
+	(mdcd-write-with-defaults) 
 	; ^^^ should only be called when developing locally
 	(import mdcd)
 ```

@@ -4,6 +4,8 @@
    assoc-set
    alist-merge
    any?
+   append-list
+   compact
    convert-rows-to-cols
    first-where
    last-index
@@ -21,7 +23,7 @@
   )
   ; (import chicken)
   (import scheme)
-  (import srfi-1) ;define's first, last and list-index
+  (import srfi-1) ;define's first, last, list-index, filter
   (import srfi-69)
   (import chicken.sort)
   (import chicken.format)
@@ -80,10 +82,10 @@
   ;   Error: (list-tail) out of range
   ;   will be thrown
   (define (nth n lst)
-    (list-ref lst (- n 1)))
+    (list-ref lst n))
 
   (define (nth1 n lst)
-    (list-ref lst n))
+    (list-ref lst (- n 1)))
 
   (define (last-index lst)
     (if (eq? (length lst) 0)
@@ -106,6 +108,12 @@
       (if (not (test (car lst)))
         (any? (cdr lst))
         #t)))
+
+  (define (append-list old-list new-list)
+    (append old-list (list new-list)))
+
+  (define (compact lst)
+     (filter (lambda(x)(not (null? x))) lst))
 
   (define (replace-nth n replacement lst)
     (cond
